@@ -8,7 +8,8 @@ function TestHomePage()
 			<p><Link to="/">Home</Link></p>
 
 			<ul>
-				<li><Link to="/localization/test">Localization</Link></li>
+				<li><Link to="/features/test">Features</Link></li>
+				<li><Link to="/ui/test">UI</Link></li>
 			</ul>
 		</div>
 	);
