@@ -1,0 +1,12 @@
+{
+	"testMessage": "This is a test message!",
+
+	"common":
+	{
+		"confirm": "Confirm",
+		"cancel": "Cancel",
+		"close": "Close",
+		"loading": "Loading...",
+		"empty": "No data"
+	}
+}

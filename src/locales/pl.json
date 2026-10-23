@@ -1,0 +1,12 @@
+{
+	"testMessage": "To jest wiadomość testowa!",
+
+	"common":
+	{
+		"confirm": "Potwierdź",
+		"cancel": "Anuluj",
+		"close": "Zamknij",
+		"loading": "Ładowanie...",
+		"empty": "Brak danych"
+	}
+}
