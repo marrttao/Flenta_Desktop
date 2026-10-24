@@ -1,7 +1,7 @@
-import { useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 import { LocalizationProvider } from '../features/localization/index';
-
+import { ToastProvider } from '../components/ui/Toast/index';
 
 
 interface AppProvidersProps {
@@ -14,7 +14,9 @@ function AppProviders({ children }: AppProvidersProps)
 {
 	return (
 		<LocalizationProvider>
-			{children}
+			<ToastProvider>
+				{children}
+			</ToastProvider>
 		</LocalizationProvider>
 	)
 }

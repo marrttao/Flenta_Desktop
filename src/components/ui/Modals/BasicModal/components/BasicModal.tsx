@@ -133,7 +133,7 @@ function BasicModal({ isOpen, closeOnBackdropClick = true, closeOnEscapeClick = 
 						(
 							<header className={styles.header}>
 								{title && <h2 className={styles.title}>{title}</h2>}
-								{showCloseButton && <button className={styles.close_button} onClick={onClose} aria-label={translate('common.close')}></button>}
+								{showCloseButton && <button className={styles.close_button} onClick={onClose} aria-label={translate('common.close')}/>}
 							</header>
 						)
 					}

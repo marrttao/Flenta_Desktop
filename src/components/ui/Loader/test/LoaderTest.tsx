@@ -13,7 +13,7 @@ function LoaderTest()
 				<Loader size="large"/>
 			</span>
 
-			<br></br>
+			<hr style={{ margin: '45px 0' }}/>
 
 			<p>With labels:</p>
 			<span style={{ display: 'flex', gap: '50px', alignItems: 'center' }}>
