@@ -4,12 +4,14 @@ import type { ComponentType } from 'react'
 
 import { LoaderTest } from '../../../components/ui/Loader/test/LoaderTest'
 import { BasicModalTest } from '../../../components/ui/Modals/BasicModal/test/BasicModalTest'
+import { ConfirmModalTest } from '../../../components/ui/Modals/ConfirmModal/test/ConfirmModalTest'
 
 
 const UI_TEST_PAGES: Record<string, ComponentType> =
 {
 	loader: LoaderTest,
 	basic_modal: BasicModalTest,
+	confirm_modal: ConfirmModalTest
 }
 
 
