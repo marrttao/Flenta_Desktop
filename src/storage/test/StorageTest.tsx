@@ -8,16 +8,39 @@ import { Loader } from '../../components/ui/Loader/index';
 
 
 
-const ALL_KEYS = Object.values(StorageKeys) as StorageKeys[];
+const ALL_KEYS = Object.values(StorageKeys) as unknown as StorageKeys[];
 const getRandomDelationDelay = (): number => { return Math.floor(Math.random() * (2000 - 500 + 1)) + 500 }
 
 
 
 function StorageTest()
 {
+	const enumKeys = StorageKeys as unknown as Record<string, StorageKeys | undefined>;
+
+	if
+	(
+		enumKeys.FOR_TEST_NON_SENSITIVE_1 === undefined ||
+		enumKeys.FOR_TEST_NON_SENSITIVE_2 === undefined ||
+		enumKeys.FOR_TEST_SENSITIVE_1 === undefined ||
+		enumKeys.FOR_TEST_SENSITIVE_2 === undefined
+	)
+	{
+		return (
+			<>
+				<p>Most likely, the test data in 'storage/keys' and 'storage/utils/policy' is commented out.</p>
+				<p>To continue the test, uncomment those lines there</p>
+			</>
+		)
+	}
+
+	return <StorageTestInner/>;
+}
+
+function StorageTestInner()
+{
 	const [, rerender] = useReducer((x: number) => x + 1, 0);
 	
-	const [key, setKey] = useState<StorageKeys>(StorageKeys.FOR_TEST_NON_SENSITIVE_1);
+	const [key, setKey] = useState<StorageKeys>(ALL_KEYS[0]);
 	const [value, setValue] = useState<string>('"dark"');
 	const [result, setResult] = useState<string | null>(null);
 
@@ -109,7 +132,7 @@ function StorageTest()
 					<h3>Set Item, Get Item, Remove Item</h3>
 
 					<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-						<select value={key} onChange={(event) => setKey(event.target.value as StorageKeys)}>
+						<select value={key} onChange={(event) => setKey(event.target.value as unknown as StorageKeys)}>
 							{
 								ALL_KEYS.map
 								(
