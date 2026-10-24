@@ -4,7 +4,7 @@ import { useTranslation } from '../hooks/useTranslation'
 
 
 
-function LocalizationTestPage()
+function LocalizationTest()
 {
 	const { language, translate } = useTranslation();
 
@@ -22,4 +22,4 @@ function LocalizationTestPage()
 
 
 
-export { LocalizationTestPage };
+export { LocalizationTest };

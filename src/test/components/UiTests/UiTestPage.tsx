@@ -2,13 +2,14 @@ import { Link, useParams } from 'react-router-dom'
 
 import type { ComponentType } from 'react'
 
-import { LoaderTestPage } from '../../../components/ui/Loader/test/LoaderTestPage'
-
+import { LoaderTest } from '../../../components/ui/Loader/test/LoaderTest'
+import { BasicModalTest } from '../../../components/ui/Modals/BasicModal/test/BasicModalTest'
 
 
 const UI_TEST_PAGES: Record<string, ComponentType> =
 {
-	loader: LoaderTestPage,
+	loader: LoaderTest,
+	basic_modal: BasicModalTest,
 }
 
 

@@ -2,13 +2,13 @@ import { Link, useParams } from 'react-router-dom'
 
 import type { ComponentType } from 'react'
 
-import { LocalizationTestPage } from '../../../features/localization/test/LocalizationTestPage'
+import { LocalizationTest } from '../../../features/localization/test/LocalizationTest'
 
 
 
 const FEATURE_TEST_PAGES: Record<string, ComponentType> =
 {
-	localization: LocalizationTestPage,
+	localization: LocalizationTest,
 }
 
 

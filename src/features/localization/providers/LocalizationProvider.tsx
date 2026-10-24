@@ -20,7 +20,7 @@ interface LocalizationContextValue
 	language: Language;
 	
 	setLanguage: (language: Language) => void;
-	translate: (key: keyof Dictionary) => string;
+	translate: (key: string) => string; 
 }
 
 interface LocalizationProvidersPros

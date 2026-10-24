@@ -2,7 +2,7 @@ import { Loader } from '../index';
 
 
 
-function LoaderTestPage()
+function LoaderTest()
 {
 	return (
 		<div>
@@ -27,4 +27,4 @@ function LoaderTestPage()
 
 
 
-export { LoaderTestPage };
+export { LoaderTest };
