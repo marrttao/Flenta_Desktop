@@ -3,12 +3,13 @@ import { Link, useParams } from 'react-router-dom'
 import type { ComponentType } from 'react'
 
 import { LocalizationTest } from '../../../features/localization/test/LocalizationTest'
-
+import { StorageTest } from '../../../storage/test/StorageTest'
 
 
 const FEATURE_TEST_PAGES: Record<string, ComponentType> =
 {
 	localization: LocalizationTest,
+	storage: StorageTest
 }
 
 
