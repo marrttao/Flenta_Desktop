@@ -18,6 +18,7 @@ export function ProfilePage() {
   return <section><h1>Профіль</h1>
     {error && <p role="alert">{error}</p>}
     <dl><dt>Пошта</dt><dd>{user.email}</dd><dt>Підтверджена</dt><dd>{user.emailConfirmed ? 'Так' : 'Ні'}</dd></dl>
+    <p><Link to="/banking">Перейти до рахунків, карток і переказів →</Link></p>
     <AuthForm submitLabel="Зберегти профіль" successMessage="Профіль збережено." onSubmit={async (data) => {
       updateUser(await updateProfile(request, data.get('displayName')))
     }}>

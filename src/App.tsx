@@ -21,6 +21,7 @@ function HomePage()
 		<>
 			<h1>HELLO WORLD!</h1>
 			<nav aria-label="Main navigation">
+				<Link to="/banking">Мій банк</Link>{' | '}
 				<Link to="/auth/sign-in">Вхід</Link>{' | '}
 				<Link to="/auth/sign-up">Реєстрація</Link>{' | '}
 				<Link to="/test">Tests</Link>
@@ -53,6 +54,7 @@ function App()
 					<Route path="/home" element={<Navigate to="/" replace/>}/>
 					<Route path="/auth/*" element={<AppRoutes/>}/>
 					<Route path="/profile" element={<AppRoutes/>}/>
+					<Route path="/banking" element={<AppRoutes/>}/>
 
 
 

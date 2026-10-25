@@ -9,7 +9,7 @@ export function SignInPage() {
   return <section><h1>Вхід</h1>
     <AuthForm submitLabel="Увійти" onSubmit={async (data) => {
       await login(data.get('email'), data.get('password'))
-      navigate('/profile')
+      navigate('/banking')
     }}>
       <p><label htmlFor="email">Електронна пошта</label><br />
         <input id="email" name="email" type="email" autoComplete="username" maxLength={254} required /></p>
