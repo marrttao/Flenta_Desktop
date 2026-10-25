@@ -23,7 +23,7 @@ interface LocalizationContextValue
 	translate: (key: string) => string; 
 }
 
-interface LocalizationProvidersPros
+interface LocalizationProvidersProps
 {
 	children: ReactNode;
 	defaultLanguage?: Language;
@@ -36,7 +36,7 @@ const LocalizationContext = createContext<LocalizationContextValue | null>(null)
 
 
 
-function LocalizationProvider({ children, defaultLanguage = DEFAULT_LANGUAGE }: LocalizationProvidersPros)
+function LocalizationProvider({ children, defaultLanguage = DEFAULT_LANGUAGE }: LocalizationProvidersProps)
 {
 	const [language, setLanguage] = useState<Language>(defaultLanguage);
 
