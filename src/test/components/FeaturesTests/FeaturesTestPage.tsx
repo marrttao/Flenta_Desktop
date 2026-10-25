@@ -4,12 +4,15 @@ import type { ComponentType } from 'react'
 
 import { LocalizationTest } from '../../../features/localization/test/LocalizationTest'
 import { StorageTest } from '../../../storage/test/StorageTest'
+import { CurrencyTest } from '../../../features/currency/test/CurrencyTest'
+
 
 
 const FEATURE_TEST_PAGES: Record<string, ComponentType> =
 {
 	localization: LocalizationTest,
-	storage: StorageTest
+	storage: StorageTest,
+	currency: CurrencyTest,
 }
 
 

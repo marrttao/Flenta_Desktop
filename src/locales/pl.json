@@ -8,5 +8,26 @@
 		"close": "Zamknij",
 		"loading": "Ładowanie...",
 		"empty": "Brak danych"
+	},
+
+	"currency":
+	{
+		"title": "Kursy walut",
+		"asOf": "Kurs na dzień",
+		"rates": "Kursy",
+		"myList": "Moja lista",
+		"currency": "Waluta",
+		"buy": "Kup",
+		"sell": "Sprzedaj",
+		"remove": "Usuń",
+		"addCurrency": "Dodaj walutę",
+		"calculator": "Kalkulator kursu krzyżowego",
+		"amount": "Kwota",
+		"loading": "Ładowanie...",
+		"error": "Błąd ładowania",
+		"retry": "Spróbuj ponownie",
+		"confirmOperation": "Potwierdź operację",
+		"cancel": "Anuluj",
+		"operationSuccess": "Operacja zakończona"
 	}
 }

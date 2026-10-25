@@ -8,7 +8,8 @@ import { TestHomePage } from './test/index'
 import
 {
     FeaturesHomePage, FeaturesTestPage,
-	UiHomePage, UiTestPage
+	UiHomePage, UiTestPage,
+	ApiHomePage, ApiTestPage
 } from './test/index'
 
 import './App.css'
@@ -65,6 +66,9 @@ function App()
 
 					<Route path="/ui/test" element={<UiHomePage/>}/>
 					<Route path="/ui/:uiComponentName/test" element={<UiTestPage/>}/>
+
+					<Route path="/api/test" element={<ApiHomePage/>}/>
+					<Route path="/api/:apiName/test" element={<ApiTestPage/>}/>
 
 
 

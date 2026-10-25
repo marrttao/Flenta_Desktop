@@ -8,5 +8,26 @@
 		"close": "Schließen",
 		"loading": "Wird geladen...",
 		"empty": "Keine Daten"
+	},
+
+	"currency":
+	{
+		"title": "Wechselkurse",
+		"asOf": "Kurs vom",
+		"rates": "Kurse",
+		"myList": "Meine Liste",
+		"currency": "Währung",
+		"buy": "Kaufen",
+		"sell": "Verkaufen",
+		"remove": "Entfernen",
+		"addCurrency": "Währung hinzufügen",
+		"calculator": "Kreuzkurs-Rechner",
+		"amount": "Betrag",
+		"loading": "Wird geladen...",
+		"error": "Ladefehler",
+		"retry": "Erneut versuchen",
+		"confirmOperation": "Vorgang bestätigen",
+		"cancel": "Abbrechen",
+		"operationSuccess": "Vorgang abgeschlossen"
 	}
 }

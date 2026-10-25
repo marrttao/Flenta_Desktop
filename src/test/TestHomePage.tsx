@@ -10,6 +10,7 @@ function TestHomePage()
 			<ul>
 				<li><Link to="/features/test">Features</Link></li>
 				<li><Link to="/ui/test">UI</Link></li>
+				<li><Link to="/api/test">API</Link></li>
 			</ul>
 		</div>
 	);
