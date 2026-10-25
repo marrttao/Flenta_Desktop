@@ -2,6 +2,7 @@ import { type ReactNode } from 'react';
 
 import { LocalizationProvider } from '../features/localization/index';
 import { ToastProvider } from '../components/ui/Toast/index';
+import { AuthProvider } from '../features/auth/components/AuthProvider.jsx';
 
 
 interface AppProvidersProps {
@@ -15,7 +16,7 @@ function AppProviders({ children }: AppProvidersProps)
 	return (
 		<LocalizationProvider>
 			<ToastProvider>
-				{children}
+				<AuthProvider>{children}</AuthProvider>
 			</ToastProvider>
 		</LocalizationProvider>
 	)

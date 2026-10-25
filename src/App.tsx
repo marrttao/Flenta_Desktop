@@ -2,6 +2,7 @@ import { BrowserRouter, Link, Route, Routes, Navigate } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
 
 import { AppProviders } from './context/AppProviders'
+import { AppRoutes } from './app/routes/AppRoutes.jsx'
 
 import { TestHomePage } from './test/index'
 import
@@ -17,7 +18,14 @@ import './App.css'
 function HomePage()
 {
 	return (
-		<h1>HELLO WORLD!</h1>
+		<>
+			<h1>HELLO WORLD!</h1>
+			<nav aria-label="Main navigation">
+				<Link to="/auth/sign-in">Вхід</Link>{' | '}
+				<Link to="/auth/sign-up">Реєстрація</Link>{' | '}
+				<Link to="/test">Tests</Link>
+			</nav>
+		</>
 	);
 }
 
@@ -43,6 +51,8 @@ function App()
 				<Routes>
 					<Route path="/" element={<HomePage/>}/>
 					<Route path="/home" element={<Navigate to="/" replace/>}/>
+					<Route path="/auth/*" element={<AppRoutes/>}/>
+					<Route path="/profile" element={<AppRoutes/>}/>
 
 
 
