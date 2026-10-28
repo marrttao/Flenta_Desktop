@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react';
-
 import { useTranslation } from '../../../../../features/localization/index';
 
 import { BasicModal } from '../../BasicModal/index';
@@ -27,11 +25,11 @@ interface ConfirmModalProps
 
 
 
-function ConfirmModal({ isOpen, title, message, confirmText = 'Confirm', cancelText = 'Cancel', variant = 'primary', loading = false, onClose, onConfirm }: ConfirmModalProps)
+function ConfirmModal({ isOpen, title, message, confirmText, cancelText, variant = 'primary', loading = false, onClose, onConfirm }: ConfirmModalProps)
 {
 	const { translate } = useTranslation()
 
-	const variantClass = styles[`btn_${variant.charAt(0).toLowerCase() + variant.slice(1)}`];
+	const variantClass = styles[`btn_${variant}`];
 
 	return (
 		<BasicModal isOpen={isOpen} onClose={onClose} title={title} size="small" showCloseButton={!loading} closeOnEscapeClick={!loading} closeOnBackdropClick={!loading}
