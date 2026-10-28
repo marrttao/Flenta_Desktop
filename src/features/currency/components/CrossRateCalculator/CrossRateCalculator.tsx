@@ -5,6 +5,8 @@ import { useDebouncedValue } from '../../../../hooks/useDevouncedValue';
 
 import { useCrossRate } from '../../hooks/useCrossRate';
 
+import { UserCurrency } from '../../../../typification';
+
 import styles from './CrossRateCalculator.module.css';
 
 
@@ -12,13 +14,14 @@ import styles from './CrossRateCalculator.module.css';
 interface CrossRateCalculatorProps
 {
 	rates: Record<string, number> | null;
+	currencies: UserCurrency[];
 	
 	onBuyClick: (from: string, to: string, amount: number) => void;
 }
 
 
 
-function CrossRateCalculator({ rates, onBuyClick }: CrossRateCalculatorProps)
+function CrossRateCalculator({ rates, currencies, onBuyClick }: CrossRateCalculatorProps)
 {
 	const [amount, setAmount] = useState<number>(100);
 	const [from, setFrom] = useState<string>('USD');
@@ -30,7 +33,11 @@ function CrossRateCalculator({ rates, onBuyClick }: CrossRateCalculatorProps)
 	const { translate } = useTranslation();
 
 	const result = useCrossRate(debouncedAmount, from, to, rates);
-	const currencyOptions = rates ? Object.keys(rates) : [];
+	const currencyOptions = (currencies.length > 0 )
+		?
+		currencies.map((currency) => currency.code)
+		:
+		(rates ? Object.keys(rates) : []);
 
 	const handleSwapCurrencies = () =>
 	{

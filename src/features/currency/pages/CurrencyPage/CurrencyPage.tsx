@@ -138,22 +138,49 @@ function CurrencyPage()
 				activeTab === 'user' &&
 				(
 					<div>
-						<div className={styles.user_currencies_container}>
-							{
-								currencies.map
-								(
-									(currency) =>
-									(
-										<div key={currency.code} className={styles.user_currency_row}>
-											<span>{currency.code}</span>
-											<button type="button" onClick={() => removeCurrency(currency.code)}>{translate('currency.remove')}</button>
-										</div>
-									)
-								)
-							}
-						</div>
+						{
+							currencies.length > 0 ?
+							(
+								<table className={styles.rates_table}>
+									<thead>
+										<tr className={styles.rates_table_header}>
+											<th className={styles.rates_table_header_cell}>{translate('currency.currency')}</th>
+											<th className={styles.rates_table_header_cell}>{translate('currency.buy')}</th>
+											<th className={styles.rates_table_header_cell}>{translate('currency.sell')}</th>
+											<th className={styles.rates_table_header_cell}></th>
+										</tr>
+									</thead>
 
-						<select onChange={(event) => { if (event.target.value) { addCurrency(event.target.value); event.target.value = ''; } }} defaultValue="">
+									<tbody>
+										{
+											currencies.map
+											(
+												(currency) =>
+												(
+													<tr key={currency.code}>
+														<td className={styles.rates_table_header_cell}>{currency.code}</td>
+														<td className={styles.rates_table_header_cell}>
+															{rates && rates[currency.code] ? formatAmount(rates[currency.code] * 1.005) : '-'}
+														</td>
+														<td className={styles.rates_table_header_cell}>
+															{rates && rates[currency.code] ? formatAmount(rates[currency.code] * 0.995) : '-'}
+														</td>
+														<td className={styles.rates_table_header_cell}>
+															<button type="button" onClick={() => handleRowBuyClick(currency.code)}>{translate('currency.buy')}</button>
+															<button type="button" onClick={() => removeCurrency(currency.code)} style={{ marginLeft: '8px' }}>{translate('currency.remove')}</button>
+														</td>
+													</tr>
+												)
+											)
+										}
+									</tbody>
+								</table>
+							)
+							:
+							(<p style={{ color: '#9ca3af', padding: '20px 0' }}>Your list is empty. Add a currency below.</p>)
+						}
+
+						<select style={{ marginTop: '16px' }} onChange={(event) => { if (event.target.value) { addCurrency(event.target.value); event.target.value = ''; } }} defaultValue="">
 							<option value="" disabled>{translate('currency.addCurrency')}</option>
 							{
 								allCurrencies.filter((code) => !currencies.some((currency) => currency.code === code)).map((code) => <option key={code} value={code}>{code}</option>)
@@ -163,7 +190,7 @@ function CurrencyPage()
 				)
 			}
 
-			<CrossRateCalculator rates={rates} onBuyClick={handleCalculatorBuyClick}/>
+			<CrossRateCalculator rates={rates} currencies={currencies} onBuyClick={handleCalculatorBuyClick}/>
 
 			<ConfirmModal
 				isOpen={tradeRequest !== null}
