@@ -17,6 +17,7 @@ const NON_SENSITIVE_KEYS: ReadonlySet<StorageKeys> = new Set
 		// StorageKeys.FOR_TEST_NON_SENSITIVE_2,
 
 		StorageKeys.USER_CURRENCY_LIST,
+		StorageKeys.THEM,
 	]
 );
 

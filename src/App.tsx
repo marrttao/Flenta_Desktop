@@ -5,6 +5,7 @@ import { AppProviders } from './context/AppProviders'
 import { AppRoutes } from './app/routes/AppRoutes.jsx'
 
 import { LanguageSwitcher } from './features/localization/index'
+import { ThemeSwitcher } from './features/theme/index'
 
 import { TestHomePage } from './test/index'
 import
@@ -52,8 +53,9 @@ function App()
 	return (
 		<AppProviders>
 			<BrowserRouter>
-				<div style={{ position: 'fixed', top: '16px', right: '16px', zIndex: 100 }}>
+				<div style={{ position: 'fixed', top: '16px', right: '16px', zIndex: 100, display: 'flex', gap: '8px' }}>
 					<LanguageSwitcher/>
+					<ThemeSwitcher/>
 				</div>
 
 

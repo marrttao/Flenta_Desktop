@@ -1,0 +1,20 @@
+.select
+{
+	padding: 6px 10px;
+
+	background: #ffffff;
+	color: #201c1cf8;
+
+	border: 1px solid #b6b0b0;
+	border-radius: 8px;
+
+	font-size: 13px;
+	font-family: inherit;
+
+	cursor: pointer;
+}
+
+.select:focus-visible
+{
+	outline: 2px solid #4625eb;
+}

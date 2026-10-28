@@ -7,6 +7,7 @@ enum StorageKeys
 	// FOR_TEST_SENSITIVE_2 = 'flenta.for_tests_sensitive_2',
 
 	USER_CURRENCY_LIST = 'flenta.user_currency_list',
+	THEM = 'flenta.them',
 }
 
 

@@ -5,6 +5,7 @@ import type { ComponentType } from 'react'
 import { LocalizationTest } from '../../../features/localization/test/LocalizationTest'
 import { StorageTest } from '../../../storage/test/StorageTest'
 import { CurrencyTest } from '../../../features/currency/test/CurrencyTest'
+import { ThemeTest } from '../../../features/theme/test/ThemeTest'
 
 
 
@@ -13,6 +14,7 @@ const FEATURE_TEST_PAGES: Record<string, ComponentType> =
 	localization: LocalizationTest,
 	storage: StorageTest,
 	currency: CurrencyTest,
+	theme: ThemeTest
 }
 
 
