@@ -29,5 +29,12 @@
 		"confirmOperation": "Vorgang bestätigen",
 		"cancel": "Abbrechen",
 		"operationSuccess": "Vorgang abgeschlossen"
+	},
+
+	"theme": {
+		"title": "Thema",
+		"light": "Hell",
+		"dark": "Dunkel",
+		"system": "System"
 	}
 }

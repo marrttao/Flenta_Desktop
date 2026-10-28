@@ -29,5 +29,13 @@
 		"confirmOperation": "Confirm operation",
 		"cancel": "Cancel",
 		"operationSuccess": "Operation completed"
+	},
+
+	"theme":
+	{
+		"title": "Theme",
+		"light": "Light",
+		"dark": "Dark",
+		"system": "System"
 	}
 }
