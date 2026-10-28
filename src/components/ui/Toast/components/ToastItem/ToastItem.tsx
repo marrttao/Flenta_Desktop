@@ -1,4 +1,5 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useTranslation } from '../../../../../features/localization';
 
 import type { ToastItemData } from '../../providers/ToastProvider';
 
@@ -16,25 +17,23 @@ interface ToastItemProps
 
 export function ToastItem({ toast, removeToast }: ToastItemProps)
 {
-	const timeoutRef = useRef<number | null>(null)
+	const { translate } = useTranslation()
 	const [isExiting, setIsExiting] = useState(false)
 
-	const handleClose = () => { setIsExiting(true); }
-	
 	useEffect
 	(
 		() =>
 		{
 			if (toast.duration <= 0 || isExiting) { return; }
 
-			timeoutRef.current = window.setTimeout(handleClose, toast.duration)
+			const timeout = window.setTimeout(() => setIsExiting(true), toast.duration)
 
 			return () =>
 			{
-				if (timeoutRef.current !== null) { clearTimeout(timeoutRef.current); }
+				clearTimeout(timeout);
 			}
 		},
-		[toast.duration, removeToast]
+		[toast.duration, isExiting]
 	);
 
 	const handleExitingAnimation = () =>
@@ -48,7 +47,7 @@ export function ToastItem({ toast, removeToast }: ToastItemProps)
 				<div className={styles.toast_title}>{toast.title}</div>
 				{toast.message && <div className={styles.toast_message}>{toast.message}</div>}
 			</div>
-			<button type="button" className={styles.toast_close_button} onClick={() => removeToast(toast.id)}/>
+			<button type="button" className={styles.toast_close_button} aria-label={translate('common.close')} onClick={() => removeToast(toast.id)}/>
 		</div>
 	);
 }

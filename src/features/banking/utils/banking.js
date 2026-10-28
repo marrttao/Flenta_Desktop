@@ -8,9 +8,11 @@ export function parseAmount(value) {
   return amount
 }
 
-export const money = (amount) => new Intl.NumberFormat('uk-UA', {
+const moneyFormatter = new Intl.NumberFormat('uk-UA', {
   style: 'currency', currency: 'UAH', maximumFractionDigits: 2,
-}).format(amount)
+})
+
+export const money = (amount) => moneyFormatter.format(amount)
 
 const messages = {
   'banking.not_configured': 'Банківський API ще не налаштований. Потрібні PostgreSQL, міграції та ключ шифрування карток.',
