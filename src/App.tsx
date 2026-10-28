@@ -4,6 +4,8 @@ import { useLocation } from 'react-router-dom'
 import { AppProviders } from './context/AppProviders'
 import { AppRoutes } from './app/routes/AppRoutes.jsx'
 
+import { LanguageSwitcher } from './features/localization/index'
+
 import { TestHomePage } from './test/index'
 import
 {
@@ -50,6 +52,11 @@ function App()
 	return (
 		<AppProviders>
 			<BrowserRouter>
+				<div style={{ position: 'fixed', top: '16px', right: '16px', zIndex: 100 }}>
+					<LanguageSwitcher/>
+				</div>
+
+
 				<Routes>
 					<Route path="/" element={<HomePage/>}/>
 					<Route path="/home" element={<Navigate to="/" replace/>}/>
