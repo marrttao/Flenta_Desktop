@@ -1,0 +1,42 @@
+.tabs_container
+{
+	display: flex;
+	gap: 8px;
+
+	margin-bottom: 16px;
+
+	border-bottom: 1px solid #444444;
+}
+
+.tab
+{
+	padding: 8px 16px;
+
+	background: transparent;
+	color: #9ca3af;
+
+	border: none;
+	border-bottom: 2px solid transparent;
+
+	font-size: 14px;
+	font-weight: 500;
+	font-family: inherit;
+
+	cursor: pointer;
+}
+.tab:hover
+{
+	color: #ffffff;
+}
+.tab:focus-visible
+{
+	outline: 2px solid #7aa2f7;
+	outline-offset: 2px;
+}
+
+.tab_active
+{
+	color: #ffffff;
+
+	border-bottom-color: #7aa2f7;
+}

@@ -8,5 +8,26 @@
 		"close": "Close",
 		"loading": "Loading...",
 		"empty": "No data"
+	},
+
+	"currency":
+	{
+		"title": "Currency Rates",
+		"asOf": "Rate as of",
+		"rates": "Rates",
+		"myList": "My list",
+		"currency": "Currency",
+		"buy": "Buy",
+		"sell": "Sell",
+		"remove": "Remove",
+		"addCurrency": "Add currency",
+		"calculator": "Cross-rate calculator",
+		"amount": "Amount",
+		"loading": "Loading...",
+		"error": "Loading error",
+		"retry": "Retry",
+		"confirmOperation": "Confirm operation",
+		"cancel": "Cancel",
+		"operationSuccess": "Operation completed"
 	}
 }

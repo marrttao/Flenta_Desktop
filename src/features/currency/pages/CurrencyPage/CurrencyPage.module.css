@@ -1,0 +1,94 @@
+.loader_container
+{
+	padding: 60px 0;
+
+	display: flex;
+	justify-content: center;
+}
+
+.error_container
+{
+	padding: 40px;
+
+	text-align: center;
+}
+
+.error_message
+{
+	margin-bottom: 16px;
+
+	color: #dc2626;
+}
+
+.retry_button
+{
+	padding: 8px 16px;
+
+	background: #2563eb;
+	color: #ffffff;
+
+	border: none;
+	border-radius: 6px;
+
+	font-weight: 600;
+
+	cursor: pointer;
+}
+.retry_button:hover
+{
+	background: #1d4ed8;
+}
+
+.container
+{
+	padding: 20px;
+}
+
+.title
+{
+	margin-bottom: 8px;
+}
+
+.as_of_date
+{
+	margin-bottom: 24px;
+
+	color: #9ca3af;
+	font-size: 13px;
+}
+
+.rates_table
+{
+	width: 100%;
+
+	border-collapse: collapse;
+}
+.rates_table_header
+{
+	text-align: left;
+
+	border-bottom: 1px solid #444444;
+}
+.rates_table_header_cell
+{
+	padding: 8px 16px;
+}
+
+.user_currencies_container
+{
+	margin-bottom: 16px;
+
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+.user_currency_row
+{
+	padding: 8px;
+	
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	border-bottom: 1px solid #333333;
+}
