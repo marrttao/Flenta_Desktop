@@ -1,6 +1,14 @@
 import { useState } from 'react'
 
+import { useTranslation } from '../../localization/index'
+
+import { mapAuthError } from '../utils/mapAuthError'
+
+
+
 export function AuthForm({ children, onSubmit, submitLabel, successMessage }) {
+  const { translate } = useTranslation()
+
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -15,7 +23,7 @@ export function AuthForm({ children, onSubmit, submitLabel, successMessage }) {
       await onSubmit(data)
       setSuccess(true)
     } catch (failure) {
-      setError(failure.message || 'Не вдалося виконати дію.')
+      setError(mapAuthError(failure, translate))
     } finally { setBusy(false) }
   }
 

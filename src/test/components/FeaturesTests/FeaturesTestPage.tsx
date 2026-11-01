@@ -6,7 +6,7 @@ import { LocalizationTest } from '../../../features/localization/test/Localizati
 import { StorageTest } from '../../../storage/test/StorageTest'
 import { CurrencyTest } from '../../../features/currency/test/CurrencyTest'
 import { ThemeTest } from '../../../features/theme/test/ThemeTest'
-
+import { AuthTest } from '../../../features/auth/test/AuthTest'
 
 
 const FEATURE_TEST_PAGES: Record<string, ComponentType> =
@@ -14,7 +14,8 @@ const FEATURE_TEST_PAGES: Record<string, ComponentType> =
 	localization: LocalizationTest,
 	storage: StorageTest,
 	currency: CurrencyTest,
-	theme: ThemeTest
+	theme: ThemeTest,
+	auth: AuthTest
 }
 
 

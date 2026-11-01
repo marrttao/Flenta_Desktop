@@ -3,12 +3,13 @@ import { Link, useParams } from 'react-router-dom'
 import type { ComponentType } from 'react'
 
 import { CurrencyApiTest } from '../../../features/currency/test/CurrencyApiTest'
-
+import { BackendHealthApiTest } from './tests/BackendHealthApiTest'
 
 
 const API_TEST_PAGES: Record<string, ComponentType> =
 {
 	currency: CurrencyApiTest,
+	'backend-health': BackendHealthApiTest,
 }
 
 
