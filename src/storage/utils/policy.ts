@@ -7,6 +7,10 @@ const SENSITIVE_KEYS: ReadonlySet<StorageKeys> = new Set
 	[
 		// StorageKeys.FOR_TEST_SENSITIVE_1,
 		// StorageKeys.FOR_TEST_SENSITIVE_2,
+
+		StorageKeys.ACCESS_TOKEN,
+		StorageKeys.REFRESH_TOKEN,
+		StorageKeys.SESSION_USER_ID,
 	]	
 );
 

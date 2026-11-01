@@ -8,6 +8,10 @@ enum StorageKeys
 
 	USER_CURRENCY_LIST = 'flenta.user_currency_list',
 	THEM = 'flenta.them',
+
+	ACCESS_TOKEN = 'flenta.access_token',
+	REFRESH_TOKEN = 'flenta.refresh_token',
+	SESSION_USER_ID = 'flenta.session_user_id',
 }
 
 

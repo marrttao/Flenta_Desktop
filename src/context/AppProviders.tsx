@@ -3,10 +3,11 @@ import { type ReactNode } from 'react';
 import { ThemeProvider } from '../features/theme/index';
 import { LocalizationProvider } from '../features/localization/index';
 import { ToastProvider } from '../components/ui/Toast/index';
-import { AuthProvider } from '../features/auth/components/AuthProvider.jsx';
+import { AuthProvider } from '../features/auth/providers/AuthProvider';
 
 
-interface AppProvidersProps {
+interface AppProvidersProps
+{
 	children: ReactNode;
 }
 

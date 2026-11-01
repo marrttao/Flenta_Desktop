@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { usePathname } from './navigation.js'
 import { Link } from './Link.jsx'
 import { useAuth } from '../../features/auth/components/authContext.js'
+import { ProtectedRoute } from '../../features/auth/components/ProtectedRoute.tsx'
 import { SignInPage } from '../../features/auth/pages/SignInPage.jsx'
 import { SignUpPage } from '../../features/auth/pages/SignUpPage.jsx'
 import { ConfirmEmailPage } from '../../features/auth/pages/ConfirmEmailPage.jsx'
@@ -23,8 +24,8 @@ export function AppRoutes() {
     '/auth/confirm-email': <ConfirmEmailPage />,
     '/auth/forgot-password': <ForgotPasswordPage />,
     '/auth/reset-password': <ResetPasswordPage />,
-    '/auth/change-password': user ? <ChangePasswordPage /> : <SignInPage />,
-    '/profile': user ? <ProfilePage /> : <SignInPage />,
+    '/auth/change-password': <ProtectedRoute><ChangePasswordPage /></ProtectedRoute>,
+    '/profile': <ProtectedRoute><ProfilePage /></ProtectedRoute>,
   }
 
   return <>
@@ -37,7 +38,7 @@ export function AppRoutes() {
         <Link to="/auth/sign-up" aria-current={path === '/auth/sign-up' ? 'page' : undefined}>Реєстрація</Link></>}
       {user && <>{' | '}<span>{user.displayName}</span>{' '}<button type="button" onClick={async () => {
         setLogoutError('')
-        try { await logout() } catch { setLogoutError('Локальну сесію завершено, але сервер не підтвердив вихід. Спробуй увійти пізніше.') }
+        try { await logout() } catch { setLogoutError('Локальну сесію завершено, але сервер не підтвердив вихід.') }
       }}>Вийти</button></>}
     </nav></header>
     {logoutError && <p role="alert">{logoutError}</p>}
