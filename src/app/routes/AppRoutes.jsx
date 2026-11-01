@@ -9,6 +9,7 @@ import { ForgotPasswordPage } from '../../features/auth/pages/ForgotPasswordPage
 import { ResetPasswordPage } from '../../features/auth/pages/ResetPasswordPage.jsx'
 import { ChangePasswordPage } from '../../features/auth/pages/ChangePasswordPage.jsx'
 import { ProfilePage } from '../../features/profile/pages/ProfilePage.jsx'
+import { FinancePage } from '../../features/finance/pages/FinancePage.jsx'
 
 export function AppRoutes() {
   const path = usePathname()
@@ -23,6 +24,7 @@ export function AppRoutes() {
     '/auth/reset-password': <ResetPasswordPage />,
     '/auth/change-password': user ? <ChangePasswordPage /> : <SignInPage />,
     '/profile': user ? <ProfilePage /> : <SignInPage />,
+    '/finance': user ? <FinancePage /> : <SignInPage />,
   }
 
   return <>
@@ -30,6 +32,7 @@ export function AppRoutes() {
       <Link to="/auth/sign-in">Вхід</Link>{' | '}
       <Link to="/auth/sign-up">Реєстрація</Link>{' | '}
       <Link to="/profile">Профіль</Link>
+      {user && <>{' | '}<Link to="/finance">Фінанси</Link></>}
       {user && <button type="button" onClick={async () => {
         setLogoutError('')
         try { await logout() } catch { setLogoutError('Локальну сесію завершено, але сервер не підтвердив вихід. Спробуй увійти пізніше.') }

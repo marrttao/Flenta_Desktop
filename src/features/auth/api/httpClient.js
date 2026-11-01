@@ -8,7 +8,7 @@ export class ApiError extends Error {
   }
 }
 
-export async function apiRequest(path, { method = 'GET', body, token } = {}) {
+export async function apiRequest(path, { method = 'GET', body, token, idempotencyKey } = {}) {
   let response
   try {
     response = await fetch(`${baseUrl}${path}`, {
@@ -17,6 +17,7 @@ export async function apiRequest(path, { method = 'GET', body, token } = {}) {
         Accept: 'application/json',
         ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
       },
       ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
       cache: 'no-store',
