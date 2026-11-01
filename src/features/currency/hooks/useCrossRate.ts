@@ -10,14 +10,15 @@ function useCrossRate(amount: number, from: string, to: string, rates: Record<st
 	(
 		() =>
 		{
-			if (!rates || amount <= 0) { return null; }
+			if (!rates || !Number.isFinite(amount) || amount <= 0) { return null; }
 			if (from === to) { return amount; }
 			
 			const rateFrom = rates[from];
 			const rateTo = rates[to];
-			if (rateFrom === undefined || rateTo === undefined) { return null; }
+			if (!Number.isFinite(rateFrom) || rateFrom <= 0 || !Number.isFinite(rateTo) || rateTo <= 0) { return null; }
 
-			return calculateCrossRate(amount, rateFrom, rateTo);
+			const result = calculateCrossRate(amount, rateFrom, rateTo);
+			return Number.isFinite(result) ? result : null;
 		},
 		[amount, from, to, rates]
 	);

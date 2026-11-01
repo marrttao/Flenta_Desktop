@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { UserCurrency } from '../../../typification/';
 
 import { storageService, StorageKeys } from '../../../storage/index';
+import { isUserCurrencyList, reorderUserCurrencies } from '../utils/userCurrencies';
 
 
 
@@ -23,16 +24,20 @@ interface UseUserCurrenciesResult
 
 function useUserCurrencies(): UseUserCurrenciesResult
 {
-	const [currencies, setCurrencies] = useState<UserCurrency[]>(() => storageService.getItem<UserCurrency[]>(StorageKeys.USER_CURRENCY_LIST) ?? DEFAULT_CURRENICIES);
-
-	const _listBeforeChange = (list: UserCurrency[]) =>
+	const [currencies, setCurrencies] = useState<UserCurrency[]>(() =>
 	{
-		storageService.setItem(StorageKeys.USER_CURRENCY_LIST, list);
-		setCurrencies(list);
-	}
+		const stored = storageService.getItem<unknown>(StorageKeys.USER_CURRENCY_LIST);
+		return isUserCurrencyList(stored) ? stored : DEFAULT_CURRENICIES;
+	});
+
+	useEffect(() =>
+	{
+		storageService.setItem(StorageKeys.USER_CURRENCY_LIST, currencies);
+	}, [currencies]);
 
 	const addCurrency = (code: string) =>
 	{
+		if (!/^[A-Z]{3}$/.test(code)) { return; }
 		setCurrencies
 		(
 			(previous) =>
@@ -40,7 +45,6 @@ function useUserCurrencies(): UseUserCurrenciesResult
 				if (previous.some((currency) => currency.code === code)) { return previous; }
 
 				const newList = [...previous, { code, order: previous.length }];
-				_listBeforeChange(newList);
 
 				return newList;
 			}
@@ -53,7 +57,6 @@ function useUserCurrencies(): UseUserCurrenciesResult
 			(previous) =>
 			{
 				const newList = previous.filter((currency) => currency.code !== code).map((currency, index) => ({ ...currency, order: index }));
-				_listBeforeChange(newList);
 
 				return newList;
 			}
@@ -61,25 +64,7 @@ function useUserCurrencies(): UseUserCurrenciesResult
 	};
 	const reorderCurrencies = (newOrder: string[]) =>
 	{
-		setCurrencies
-		(
-			(previous) =>
-			{
-				const map = new Map(previous.map((currency) => [currency.code, currency]));
-				const newList = newOrder.map
-				(
-					(code, index) =>
-					{
-						const item = map.get(code);
-						return item ? { ...item, order: index } : null;
-					}
-				)
-				.filter((item): item is UserCurrency => item !== null);
-				_listBeforeChange(newList);
-				
-				return newList;
-			}
-		);
+		setCurrencies((previous) => reorderUserCurrencies(previous, newOrder));
 	};
 
 	return { currencies, addCurrency, removeCurrency, reorderCurrencies };

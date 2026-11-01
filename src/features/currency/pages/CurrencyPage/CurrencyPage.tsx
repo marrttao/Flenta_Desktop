@@ -10,6 +10,7 @@ import { useCurrencyRates } from '../../hooks/useCurrencyRates';
 import { useUserCurrencies  } from '../../hooks/useUserCurrencies';
 
 import { currencyRepository } from '../../api/currencyRepository';
+import { applyBuySpread, applySellSpread } from '../../utils/crossRate';
 
 import { Tabs } from '../../components/Tabs/Tabs';
 import { CurrencyRateRow } from '../../components/CurrencyRateRow/CurrencyRateRow';
@@ -160,10 +161,10 @@ function CurrencyPage()
 													<tr key={currency.code}>
 														<td className={styles.rates_table_header_cell}>{currency.code}</td>
 														<td className={styles.rates_table_header_cell}>
-															{rates && rates[currency.code] ? formatAmount(rates[currency.code] * 1.005) : '-'}
+															{rates && rates[currency.code] ? formatAmount(applyBuySpread(rates[currency.code])) : '-'}
 														</td>
 														<td className={styles.rates_table_header_cell}>
-															{rates && rates[currency.code] ? formatAmount(rates[currency.code] * 0.995) : '-'}
+															{rates && rates[currency.code] ? formatAmount(applySellSpread(rates[currency.code])) : '-'}
 														</td>
 														<td className={styles.rates_table_header_cell}>
 															<button type="button" onClick={() => handleRowBuyClick(currency.code)}>{translate('currency.buy')}</button>
