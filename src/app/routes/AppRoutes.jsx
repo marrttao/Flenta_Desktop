@@ -10,10 +10,19 @@ import { ResetPasswordPage } from '../../features/auth/pages/ResetPasswordPage.j
 import { ChangePasswordPage } from '../../features/auth/pages/ChangePasswordPage.jsx'
 import { ProfilePage } from '../../features/profile/pages/ProfilePage.jsx'
 import { FinancePage } from '../../features/finance/pages/FinancePage.jsx'
+import { KycProvider } from '../../features/kyc/components/KycProvider.jsx'
+import { useKyc } from '../../features/kyc/components/kycContext.js'
+import { KycPage } from '../../features/kyc/pages/KycPage.jsx'
 
 export function AppRoutes() {
+  return <KycProvider><ApplicationRoutes /></KycProvider>
+}
+
+function ApplicationRoutes() {
   const path = usePathname()
   const { user, logout } = useAuth()
+  const { status } = useKyc()
+  const verified = status?.canAccess === true
   const [logoutError, setLogoutError] = useState('')
   const routes = {
     '/': <SignInPage />,
@@ -25,20 +34,23 @@ export function AppRoutes() {
     '/auth/change-password': user ? <ChangePasswordPage /> : <SignInPage />,
     '/profile': user ? <ProfilePage /> : <SignInPage />,
     '/finance': user ? <FinancePage /> : <SignInPage />,
+    '/kyc': user ? <ProfilePage /> : <SignInPage />,
   }
+
+  const recovery = ['/auth/forgot-password', '/auth/reset-password', '/auth/confirm-email'].includes(path)
+  const content = user && !verified && !recovery ? <KycPage key={user.id} /> : routes[path]
 
   return <>
     <header><nav aria-label="Основна навігація">
-      <Link to="/auth/sign-in">Вхід</Link>{' | '}
-      <Link to="/auth/sign-up">Реєстрація</Link>{' | '}
-      <Link to="/profile">Профіль</Link>
-      {user && <>{' | '}<Link to="/finance">Фінанси</Link></>}
+      {!user && <><Link to="/auth/sign-in">Вхід</Link>{' | '}<Link to="/auth/sign-up">Реєстрація</Link></>}
+      {user && !verified && <Link to="/kyc">Підтвердження особи</Link>}
+      {user && verified && <><Link to="/profile">Профіль</Link>{' | '}<Link to="/finance">Фінанси</Link></>}
       {user && <button type="button" onClick={async () => {
         setLogoutError('')
         try { await logout() } catch { setLogoutError('Локальну сесію завершено, але сервер не підтвердив вихід. Спробуй увійти пізніше.') }
       }}>Вийти</button>}
     </nav></header>
     {logoutError && <p role="alert">{logoutError}</p>}
-    <main key={path}>{routes[path] || <section><h1>Сторінку не знайдено</h1><Link to="/">На головну</Link></section>}</main>
+    <main key={path}>{content || <section><h1>Сторінку не знайдено</h1><Link to="/">На головну</Link></section>}</main>
   </>
 }

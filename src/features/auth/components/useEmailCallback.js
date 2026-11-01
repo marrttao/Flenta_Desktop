@@ -16,7 +16,7 @@ export function useEmailCallback(isRecovery = false) {
     if (params.size || window.location.hash) window.history.replaceState(null, '', window.location.pathname)
     if (!code) return
     exchangeCode(code)
-      .then(() => { if (!isRecovery) navigate('/profile') })
+      .then(() => { if (!isRecovery) navigate('/kyc') })
       .catch((failure) => setError(failure.message))
       .finally(() => setPending(false))
   }, [exchangeCode, isRecovery])

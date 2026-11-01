@@ -1,10 +1,11 @@
 const baseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5080').replace(/\/$/, '')
 
 export class ApiError extends Error {
-  constructor(message, status) {
+  constructor(message, status, code = null) {
     super(message)
     this.name = 'ApiError'
     this.status = status
+    this.code = code
   }
 }
 
@@ -28,7 +29,7 @@ export async function apiRequest(path, { method = 'GET', body, token, idempotenc
   if (!response.ok) {
     const problem = await response.json().catch(() => ({}))
     const validation = problem.errors ? Object.values(problem.errors).flat().join(' ') : ''
-    throw new ApiError(validation || problem.detail || problem.title || 'Запит не виконано.', response.status)
+    throw new ApiError(validation || problem.detail || problem.title || 'Запит не виконано.', response.status, problem.code || null)
   }
   if (response.status === 204) return null
   return response.json()

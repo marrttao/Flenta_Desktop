@@ -10,7 +10,7 @@ export function SignUpPage() {
   return <section><h1>Реєстрація</h1>
     <AuthForm submitLabel="Зареєструватися" onSubmit={async (data) => {
       const result = await register(data.get('email'), readPassword(data), data.get('displayName'))
-      navigate(result.requiresEmailConfirmation ? '/auth/confirm-email' : '/profile')
+      navigate(result.requiresEmailConfirmation ? '/auth/confirm-email' : '/kyc')
     }}>
       <p><label htmlFor="displayName">Ім’я</label><br />
         <input id="displayName" name="displayName" autoComplete="name" maxLength={100} required /></p>
