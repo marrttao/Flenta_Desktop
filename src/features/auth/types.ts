@@ -37,6 +37,8 @@ interface AuthRegisterResult
 interface AuthContextValue
 {
 	user: AuthUser | null;
+	kycEpoch: number;
+	isRestoringSession: boolean;
 	sessionInfo: AuthSessionInfo | null;
 
 	request: <Type = unknown>(path: string, options?: AuthRequestOptions) => Promise<Type>;

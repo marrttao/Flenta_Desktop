@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState, useMemo, useRef, type ReactNode } fro
 import { AuthContext } from './authContext';
 
 import { authApi } from '../api/authApi';
-import { apiRequest } from '../api/httpClient'
+import { ApiError, apiRequest, type ApiRequestOptions } from '../api/httpClient'
 import { clearVerifier, getVerifier, startPkce } from '../api/pkce';
 
 import { storageService, StorageKeys } from '../../../storage/index';
@@ -74,6 +74,8 @@ function resolveExpiresAt(value: AuthSession | null): number | null
 function AuthProvider({ children }: AuthProviderProps)
 {
 	const [user, setUser] = useState<AuthUser | null>(null);
+	const [kycEpoch, setKycEpoch] = useState(0);
+	const [isRestoringSession, setIsRestoringSession] = useState(true);
 	const [expiresAt, setExpiresAt] = useState<number | null>(null);
 
 	const { msUntilExpiry } = useTokenExpiry(expiresAt);
@@ -91,6 +93,7 @@ function AuthProvider({ children }: AuthProviderProps)
 			session.current = value;
 
 			setUser(value?.user ?? null);
+			setKycEpoch((epoch) => epoch + 1);
 			setExpiresAt(resolveExpiresAt(value));
 			persist(value);
 		},
@@ -105,12 +108,23 @@ function AuthProvider({ children }: AuthProviderProps)
 
 			const currentVersion = version.current;
 			const usedToken = session.current.accessToken;
+			const send = async (requestOptions: ApiRequestOptions): Promise<Type> =>
+			{
+				try { return await apiRequest<Type>(path, requestOptions); }
+				catch (error)
+				{
+					if (currentVersion === version.current && !path.startsWith('/api/kyc')
+						&& error instanceof ApiError && error.code?.startsWith('kyc.'))
+						setKycEpoch((epoch) => epoch + 1);
+					throw error;
+				}
+			};
 
-			try { return await (apiRequest(path, { ...options, token: usedToken }) as Promise<Type>); }
+			try { return await send({ ...options, token: usedToken }); }
 			catch (error)
 			{
 				if (readStatus(error) !== 401 || !session.current || currentVersion !== version.current) { throw error; }
-				if (session.current.accessToken !== usedToken) { return (apiRequest(path, { ...options, token: session.current.accessToken }) as Promise<Type>); }
+				if (session.current.accessToken !== usedToken) { return send({ ...options, token: session.current.accessToken }); }
 				if (!refresh.current)
 				{
 					refresh.current = (authApi.refresh(session.current.refreshToken) as Promise<AuthSession>)
@@ -137,7 +151,7 @@ function AuthProvider({ children }: AuthProviderProps)
 				}
 
 				const refreshedSession = await refresh.current;
-				return (apiRequest(path, { ...options, token: refreshedSession.accessToken }) as Promise<Type>);
+				return send({ ...options, token: refreshedSession.accessToken });
 			}
 		},
 		[acceptSession]
@@ -239,7 +253,7 @@ function AuthProvider({ children }: AuthProviderProps)
 		{
 			let active = true;
 			const refreshToken = storageService.getItem(StorageKeys.REFRESH_TOKEN);
-			if (!refreshToken) { return; }
+			if (!refreshToken) { setIsRestoringSession(false); return; }
 
 			(
 				async () =>
@@ -255,6 +269,10 @@ function AuthProvider({ children }: AuthProviderProps)
 					{
 						if (!active) { return; }
 						acceptSession(null);
+					}
+					finally
+					{
+						if (active) { setIsRestoringSession(false); }
 					}
 				}
 			)();
@@ -296,8 +314,8 @@ function AuthProvider({ children }: AuthProviderProps)
 
 	const value = useMemo<AuthContextValue>
 	(
-		() => ({ user, sessionInfo, request, login, register, recover, exchangeCode, logout, updateUser, refreshSession }),
-		[user, sessionInfo, request, login, register, recover, exchangeCode, logout, updateUser, refreshSession]
+		() => ({ user, kycEpoch, isRestoringSession, sessionInfo, request, login, register, recover, exchangeCode, logout, updateUser, refreshSession }),
+		[user, kycEpoch, isRestoringSession, sessionInfo, request, login, register, recover, exchangeCode, logout, updateUser, refreshSession]
 	);
 
 

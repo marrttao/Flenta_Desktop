@@ -6,6 +6,7 @@ import { clearVerifier, getVerifier, startPkce } from '../api/pkce.js'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
+  const [kycEpoch, setKycEpoch] = useState(0)
   const session = useRef(null)
   const version = useRef(0)
   const refreshInFlight = useRef(null)
@@ -19,12 +20,20 @@ export function AuthProvider({ children }) {
     if (!session.current) throw new Error('Увійди до облікового запису.')
     const currentVersion = version.current
     const usedToken = session.current.accessToken
+    const send = async (optionsWithToken) => {
+      try { return await apiRequest(path, optionsWithToken) } catch (failure) {
+        if (currentVersion === version.current && !path.startsWith('/api/kyc') && failure.code?.startsWith('kyc.')) {
+          setKycEpoch((value) => value + 1)
+        }
+        throw failure
+      }
+    }
     try {
-      return await apiRequest(path, { ...options, token: usedToken })
+      return await send({ ...options, token: usedToken })
     } catch (error) {
       if (error.status !== 401 || !session.current || currentVersion !== version.current) throw error
       if (session.current.accessToken !== usedToken) {
-        return apiRequest(path, { ...options, token: session.current.accessToken })
+        return send({ ...options, token: session.current.accessToken })
       }
       if (!refreshInFlight.current) {
         refreshInFlight.current = authApi.refresh(session.current.refreshToken)
@@ -40,13 +49,14 @@ export function AuthProvider({ children }) {
           .finally(() => { refreshInFlight.current = null })
       }
       const refreshed = await refreshInFlight.current
-      return apiRequest(path, { ...options, token: refreshed.accessToken })
+      return send({ ...options, token: refreshed.accessToken })
     }
   }, [acceptSession])
 
   const login = useCallback(async (email, password) => {
     const value = await authApi.login({ email, password })
     version.current += 1
+    setKycEpoch((value) => value + 1)
     acceptSession(value)
   }, [acceptSession])
 
@@ -56,6 +66,7 @@ export function AuthProvider({ children }) {
     if (result.session) {
       clearVerifier()
       version.current += 1
+      setKycEpoch((value) => value + 1)
       acceptSession(result.session)
     }
     return result
@@ -70,6 +81,7 @@ export function AuthProvider({ children }) {
     const value = await authApi.exchange(code, getVerifier())
     clearVerifier()
     version.current += 1
+    setKycEpoch((value) => value + 1)
     acceptSession(value)
   }, [acceptSession])
 
@@ -84,7 +96,7 @@ export function AuthProvider({ children }) {
     if (session.current?.user.id === profile.id) acceptSession({ ...session.current, user: profile })
   }, [acceptSession])
 
-  return <AuthContext.Provider value={{ user, login, register, recover, exchangeCode, logout, request, updateUser }}>
+  return <AuthContext.Provider value={{ user, kycEpoch, login, register, recover, exchangeCode, logout, request, updateUser }}>
     {children}
   </AuthContext.Provider>
 }

@@ -1,0 +1,15 @@
+export const financeApi = {
+  accounts: (request) => request('/api/accounts'),
+  cards: (request) => request('/api/cards'),
+  goals: (request) => request('/api/goals'),
+  rates: (request) => request('/api/finance/rates'),
+  cashback: (request) => request('/api/finance/cashback'),
+  analytics: (request, from, through) => request(`/api/finance/analytics?${new URLSearchParams({ from, through })}`),
+  openAccount: (request, currency) => request(`/api/accounts?${new URLSearchParams({ currency })}`, { method: 'POST' }),
+  issueCard: (request, accountId) => request('/api/cards', { method: 'POST', body: { accountId } }),
+  createGoal: (request, body) => request('/api/goals', { method: 'POST', body }),
+  updateGoal: (request, id, body) => request(`/api/goals/${id}`, { method: 'PUT', body }),
+  archiveGoal: (request, id) => request(`/api/goals/${id}/archive`, { method: 'POST' }),
+  quote: (request, body) => request('/api/finance/exchange-quotes', { method: 'POST', body }),
+  money: (request, path, body, idempotencyKey) => request(path, { method: 'POST', body, idempotencyKey }),
+}
