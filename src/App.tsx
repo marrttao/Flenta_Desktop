@@ -65,6 +65,8 @@ function App()
 					<Route path="/auth/*" element={<AppRoutes/>}/>
 					<Route path="/profile" element={<AppRoutes/>}/>
 					<Route path="/banking" element={<AppRoutes/>}/>
+					<Route path="/finance" element={<AppRoutes/>}/>
+					<Route path="/kyc" element={<AppRoutes/>}/>
 
 
 

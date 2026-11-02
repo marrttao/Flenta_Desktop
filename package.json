@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "js-cookie": "^3.0.8",
+    "@didit-protocol/sdk-web": "0.5.3",
+    "qrcode": "1.5.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.4"

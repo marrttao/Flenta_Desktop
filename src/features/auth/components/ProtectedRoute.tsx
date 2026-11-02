@@ -15,7 +15,8 @@ interface ProtectedRouteProps
 
 function ProtectedRoute({ children, redirectTo = '/auth/sign-in' }: ProtectedRouteProps)
 {
-	const { user } = useAuth();
+	const { user, isRestoringSession } = useAuth();
+	if (isRestoringSession) { return <p role="status">Відновлюємо сесію…</p>; }
 	
 	if (!user) { return <Navigate to={redirectTo} replace/> }
 
