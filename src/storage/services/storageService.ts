@@ -47,6 +47,7 @@ class StorageService
 		try
 		{
 			const rawValue = JSON.stringify(value);
+			if (rawValue === undefined) { return; }
 			this._adapterForKey(key).setItem(key, rawValue);
 		}
 		catch (error) { console.warn(`[StorageService.set<${typeof value}>]Failed to stringify value: ${key} - ${error}`); }
