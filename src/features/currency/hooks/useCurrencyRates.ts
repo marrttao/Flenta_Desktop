@@ -67,6 +67,12 @@ function useCurrencyRates(baseCurrency: string = DEAFAULT_BASE_CURRENCY): UseCur
 					setIsLoading(false);
 				}
 			)
+
+			return () =>
+			{
+				active = false;
+				controller.abort();
+			};
 		},
 		[baseCurrency, reloadKey]
 	);

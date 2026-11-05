@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { useFormatters, useTranslation } from '../../../localization/index'
-import { useDebouncedValue } from '../../../../hooks/useDevouncedValue';
+import { useDebouncedValue } from '../../../../hooks/useDebouncedValue';
 
 import { useCrossRate } from '../../hooks/useCrossRate';
 
@@ -69,7 +69,7 @@ function CrossRateCalculator({ rates, currencies, onBuyClick }: CrossRateCalcula
 				{translate('currency.amount')}: {formatAmount(amount)} {from} to {result !== null ? formatAmount(result) : '-'} {to}
 			</p>
 
-			<button type="button" className={styles.buy_button} onClick={() => onBuyClick(from, to, amount)} disabled={result === null}>
+			<button type="button" className={styles.buy_button} onClick={() => onBuyClick(from, to, amount)} disabled={result === null || !Number.isFinite(amount) || amount <= 0 || amount !== debouncedAmount}>
 				{translate('currency.buy')}
 			</button>
 		</div>
