@@ -10,7 +10,7 @@ import { ForgotPasswordPage } from '../../features/auth/pages/ForgotPasswordPage
 import { ResetPasswordPage } from '../../features/auth/pages/ResetPasswordPage.jsx'
 import { ChangePasswordPage } from '../../features/auth/pages/ChangePasswordPage.jsx'
 import { ProfilePage } from '../../features/profile/pages/ProfilePage.jsx'
-import { BankingPage } from '../../features/banking/pages/BankingPage.jsx'
+import { DashboardPage } from '../../features/dashboard/ui/DashboardPage'
 import { FinancePage } from '../../features/finance/pages/FinancePage.jsx'
 import { KycProvider } from '../../features/kyc/components/KycProvider.jsx'
 import { useKyc } from '../../features/kyc/components/kycContext.js'
@@ -27,8 +27,8 @@ function ApplicationRoutes() {
   const verified = status?.canAccess === true
   const [logoutError, setLogoutError] = useState('')
   const routes = {
-    '/': <BankingPage key={user?.id || 'guest'} />,
-    '/banking': <BankingPage key={user?.id || 'guest'} />,
+    '/': <DashboardPage key={user?.id || 'guest'} />,
+    '/banking': <DashboardPage key={user?.id || 'guest'} />,
     '/auth/sign-in': <SignInPage />,
     '/auth/sign-up': <SignUpPage />,
     '/auth/confirm-email': <ConfirmEmailPage />,
