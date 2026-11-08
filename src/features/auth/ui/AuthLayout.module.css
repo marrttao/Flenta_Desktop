@@ -1,0 +1,233 @@
+/* These shell adjustments apply only while one of the new auth screens is mounted. */
+:global(#root):has(.layout) {
+  display: block;
+  padding: 0;
+  background: #fff;
+}
+
+:global(#root):has(.layout) > :global(header) {
+  display: none;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 29fr) minmax(0, 31fr);
+  min-height: 100svh;
+  width: 100%;
+  background: #fff;
+  color: #15121b;
+  color-scheme: light;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.brand {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100svh;
+  overflow: hidden;
+  background: #10101e;
+}
+
+.hero {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100svh;
+  padding: clamp(48px, 3.33vw, 64px) clamp(24px, 2.604vw, 50px) clamp(24px, 2.5vw, 48px);
+}
+
+.title {
+  margin: 0;
+  color: #111;
+  font-size: clamp(32px, 3.333vw, 64px);
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: -0.045em;
+}
+
+.description {
+  margin: 16px 0 0;
+  color: #515151;
+  font-size: clamp(16px, 1.667vw, 32px);
+  line-height: 1.4;
+}
+
+.formArea {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding-top: clamp(40px, 3.646vw, 70px);
+}
+
+.formArea > form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.formArea fieldset {
+  display: contents;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(28px, 3.385vw, 65px) clamp(20px, 2.604vw, 50px);
+}
+
+.singleColumn {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 100%;
+  row-gap: clamp(28px, 2.604vw, 50px);
+}
+
+.field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+  color: #515151;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.field > span {
+  padding-left: 8px;
+}
+
+.field input {
+  width: 100%;
+  height: clamp(52px, 3.646vw, 70px);
+  min-width: 0;
+  padding: 12px 18px;
+  border: 1.5px solid #40364e;
+  border-radius: clamp(12px, 1.146vw, 22px);
+  background: #fff;
+  color: #17131e;
+  font-family: inherit;
+  font-size: 18px;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.field input:focus-visible {
+  outline: 3px solid #6b56ff;
+  outline-offset: 3px;
+}
+
+.field input:disabled {
+  background: #f6f5f9;
+  color: #686171;
+}
+
+.field small {
+  padding-left: 8px;
+  color: #69616f;
+  font-size: 12px;
+}
+
+.recovery {
+  margin: 20px 0 40px;
+  text-align: right;
+  font-size: 14px;
+}
+
+.layout a {
+  color: #5037f7;
+  text-underline-offset: 4px;
+}
+
+.layout a:focus-visible {
+  outline: 2px solid #5037f7;
+  outline-offset: 5px;
+  border-radius: 2px;
+}
+
+.formArea fieldset > button[type='submit'] {
+  align-self: center;
+  width: min(100%, 500px);
+  min-height: clamp(52px, 3.646vw, 70px);
+  margin-top: auto;
+  padding: 14px 24px;
+  border: 0;
+  border-radius: clamp(8px, 0.729vw, 14px);
+  background: #5237ff;
+  color: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease;
+}
+
+.formArea fieldset > button[type='submit']:hover:not(:disabled) {
+  background: #4225e9;
+}
+
+.formArea fieldset > button[type='submit']:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.formArea fieldset > button[type='submit']:focus-visible {
+  outline: 3px solid #8d7bff;
+  outline-offset: 4px;
+}
+
+.formArea fieldset > button[type='submit']:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.formArea [role='alert'] {
+  margin: 0 0 24px;
+  padding: 14px 16px;
+  border: 1px solid #e9bcbc;
+  border-radius: 10px;
+  background: #fff4f4;
+  color: #9b2626;
+  font-size: 14px;
+}
+
+.footer {
+  padding-top: 24px;
+  color: #615c68;
+  text-align: center;
+  font-size: 14px;
+}
+
+.footer p {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .brand { position: relative; height: clamp(220px, 50vw, 320px); }
+  .hero { object-position: center 46%; }
+  .content { min-height: 620px; padding: 32px 24px; }
+  .title { font-size: 36px; }
+  .description { margin-top: 12px; font-size: 17px; }
+  .formArea { padding-top: 36px; }
+  .formArea fieldset > button[type='submit'] { margin-top: 44px; }
+}
+
+@media (max-width: 420px) {
+  .content { padding: 32px 20px; }
+  .title { font-size: 32px; }
+  .fields { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout * { transition: none; }
+}
