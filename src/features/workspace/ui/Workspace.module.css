@@ -112,7 +112,7 @@
 .chipSuccess { background: var(--success); color: var(--on-chip); }
 .chipWarning { background: var(--warning); color: #645221; }
 .chipDanger { background: var(--danger); color: #67323a; }
-.soon { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 20px; background: var(--highlight); color: var(--accent); font-size: 10px; font-weight: 600; vertical-align: middle; white-space: nowrap; }
+.soon { display: inline-block; margin-left: 8px; padding: 1px 8px; line-height: 12px; border-radius: 20px; background: var(--highlight); color: var(--accent); font-size: 10px; font-weight: 600; vertical-align: middle; white-space: nowrap; }
 
 .toggleRow { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; }
 .toggleRow strong { display: block; font-size: 13px; font-weight: 500; }
