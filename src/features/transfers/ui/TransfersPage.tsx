@@ -62,7 +62,7 @@ export function TransfersPage() {
   }
 
   return <WorkspaceLayout section="transfers" title={t('Transfers', 'Перекази')} subtitle={t('Send money simply, securely and on your terms.', 'Надсилай кошти просто, безпечно й на своїх умовах.')}
-    actions={<button type="button" className={ui.button} disabled title={t('Coming soon', 'Незабаром')}>{t('Manage recipients', 'Керувати одержувачами')}<SoonBadge/></button>}>
+    actions={<button type="button" className={`${ui.button} ${styles.manage}`} disabled title={t('Coming soon', 'Незабаром')}>{t('Manage recipients', 'Керувати одержувачами')}</button>}>
     {!confirming && <Feedback error={m.error} notice={m.notice}/>}
     {m.loaded && !m.accounts.length && <p className={ui.notice}>{t('Open an account on the Home page to start sending money.', 'Відкрий рахунок на головній, щоб почати надсилати кошти.')}</p>}
     <div className={styles.grid}>

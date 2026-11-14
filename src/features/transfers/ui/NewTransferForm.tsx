@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import type { Account, DashboardModel } from '../../dashboard/model/useDashboard'
 import { lastDigits } from '../../banking/utils/transactionLabel'
 import { SoonBadge } from '../../workspace/ui/WorkspaceControls'
@@ -32,38 +31,36 @@ export function NewTransferForm({ model: m, draft, fee, onChange, onSubmit }: Pr
     { id: 'iban', label: t('Bank account', 'На рахунок IBAN') },
     { id: 'own', label: t('Between my cards', 'Між своїми') },
   ]
-  return <section className={ui.panel}>
-    <div className={ui.panelHeader}><h2>{t('New transfer', 'Новий переказ')}</h2></div>
-    <div className={ui.segmented} role="group" aria-label={t('Transfer method', 'Спосіб переказу')}>
-      {modes.map(mode => <button key={mode.id} type="button" className={ui.segment} aria-pressed={draft.mode === mode.id} disabled={mode.id === 'card'}
+  return <section className={styles.newTransfer}>
+    <h2 className={styles.title}>{t('New transfer', 'Новий переказ')}</h2>
+    <div className={styles.modes} role="group" aria-label={t('Transfer method', 'Спосіб переказу')}>
+      {modes.map(mode => <button key={mode.id} type="button" className={styles.mode} aria-pressed={draft.mode === mode.id} disabled={mode.id === 'card'}
         onClick={() => set({ mode: mode.id, destination: '' })}>{mode.label}{mode.id === 'card' && <SoonBadge/>}</button>)}
     </div>
-    <form className={styles.form} onSubmit={event => { event.preventDefault(); onSubmit() }}>
-      <fieldset disabled={m.disabled || !m.accounts.length}>
-        <label className={ui.field}>{t('From', 'Звідки')}
+    <form onSubmit={event => { event.preventDefault(); onSubmit() }}>
+      <fieldset className={styles.fields} disabled={m.disabled || !m.accounts.length}>
+        <label className={`${ui.field} ${styles.first}`}>{t('From card', 'З картки')}
           <select value={draft.source} required onChange={e => set({ source: e.target.value, destination: '' })}>
             {m.accounts.map(a => <option key={a.id} value={a.id}>{accountLabel(m, a)}</option>)}
           </select>
         </label>
-        {account && <p className={styles.hint}>{t('Available', 'Доступно')}: {m.format(account.balance, account.currency)}</p>}
-        {draft.mode === 'iban' ? <label className={ui.field}>{t('Recipient IBAN', 'IBAN одержувача')}
+        <p className={styles.available}>{account ? `${t('Available', 'Доступно')}: ${m.format(account.balance, account.currency)}` : ' '}</p>
+        {draft.mode === 'iban' ? <label className={`${ui.field} ${styles.afterHint}`}>{t('Recipient IBAN', 'IBAN одержувача')}
           <input value={draft.destination} required maxLength={64} placeholder="UA00 0000 0000 0000 0000 0000 0000 0" autoComplete="off" onChange={e => set({ destination: e.target.value })}/>
-          <small>{t('The recipient must have an account in this sandbox.', 'Одержувач має мати рахунок у цій пісочниці.')}</small>
-        </label> : <label className={ui.field}>{t('To my account', 'На мій рахунок')}
+        </label> : <label className={`${ui.field} ${styles.afterHint}`}>{t('To my account', 'На мій рахунок')}
           <select value={draft.destination} required onChange={e => set({ destination: e.target.value })}>
-            <option value="">{t('Choose an account', 'Обери рахунок')}</option>
+            <option value="">{destinations.length ? t('Choose an account', 'Обери рахунок') : t('No other account in this currency', 'Немає іншого рахунку в цій валюті')}</option>
             {destinations.map(a => <option key={a.id} value={a.id}>{accountLabel(m, a)}</option>)}
           </select>
-          {!destinations.length && <small>{t('Open another account in the same currency, or use', 'Відкрий інший рахунок у цій валюті або скористайся')} <Link className={ui.link} to="/exchange">{t('currency exchange', 'обміном валют')}</Link>.</small>}
         </label>}
-        <div className={ui.fieldRow}>
+        <div className={styles.amountRow}>
           <label className={ui.field}>{t('Amount', 'Сума')}<input value={draft.amount} inputMode="decimal" required placeholder="0,00" autoComplete="off" onChange={e => set({ amount: e.target.value })}/></label>
           <label className={ui.field}>{t('Currency', 'Валюта')}<input value={account?.currency || 'UAH'} readOnly aria-readonly="true"/></label>
         </div>
-        <label className={ui.field}><span>{t('Message (optional)', 'Повідомлення (необов’язково)')}<SoonBadge/></span><input disabled placeholder={t('For our weekend plans', 'На плани на вихідні')}/></label>
+        <label className={`${ui.field} ${styles.next}`}><span>{t('Message (optional)', 'Повідомлення (необов’язково)')}<SoonBadge/></span><input disabled placeholder={t('For our weekend plans', 'На плани на вихідні')}/></label>
         <div className={styles.footer}>
           <span className={styles.fee} aria-live="polite">{fee}</span>
-          <button className={ui.button} type="submit">{t('Continue', 'Продовжити')}</button>
+          <button className={`${ui.button} ${styles.continue}`} type="submit">{t('Continue', 'Продовжити')}</button>
         </div>
       </fieldset>
     </form>
