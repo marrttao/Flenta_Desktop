@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDashboard, type Card, type DashboardModel } from '../../dashboard/model/useDashboard'
-import { lastDigits, transactionLabel } from '../../banking/utils/transactionLabel'
+import { lastDigits, transactionLabel, transactionStatus } from '../../banking/utils/transactionLabel'
 import { WorkspaceLayout } from '../../workspace/ui/WorkspaceLayout'
-import { EmptyState, Feedback, SoonBadge, StatusChip, ToggleRow } from '../../workspace/ui/WorkspaceControls'
+import { EmptyState, Feedback, SoonBadge } from '../../workspace/ui/WorkspaceControls'
 import { Icon } from '../../workspace/ui/Icon'
 import ui from '../../workspace/ui/Workspace.module.css'
 import { AddCardDialog, CardDetailsDialog, CloseCardDialog, TestPurchaseDialog } from './CardDialogs'
@@ -22,40 +22,50 @@ function expiry(card: Card, long = false) {
 
 function CardStatus({ card, model: m }: { card: Card; model: DashboardModel }) {
   const t = m.text
-  if (card.status === 'Active') return <StatusChip tone="success">{t('Active', 'Активна')}</StatusChip>
-  if (card.status === 'Blocked') return <StatusChip tone="warning">{t('Frozen', 'Заморожена')}</StatusChip>
-  return <StatusChip tone="danger">{t('Closed', 'Закрита')}</StatusChip>
+  if (card.status === 'Active') return <span className={`${styles.chip} ${styles.chipActive}`}>{t('Active', 'Активна')}</span>
+  if (card.status === 'Blocked') return <span className={`${styles.chip} ${styles.chipFrozen}`}>{t('Frozen', 'Заморожена')}</span>
+  return <span className={`${styles.chip} ${styles.chipClosed}`}>{t('Closed', 'Закрита')}</span>
 }
 
 function CardActivity({ model: m, card }: { model: DashboardModel; card: Card }) {
   const t = m.text
-  const rows = m.transactions.filter(row => row.sourceAccountId === card.accountId || row.destinationAccountId === card.accountId).slice(0, 5)
-  return <section className={ui.panel}>
-    <div className={ui.panelHeader}><h2>{t('Recent card activity', 'Остання активність')}</h2><Link className={ui.link} to="/#dashboard-history">{t('View all', 'Усі операції')}</Link></div>
-    {rows.length ? <table className={styles.table}>
-      <thead><tr><th>{t('Operation', 'Операція')}</th><th>{t('Date', 'Дата')}</th><th>{t('Amount', 'Сума')}</th></tr></thead>
-      <tbody>{rows.map(row => {
+  const rows = m.transactions.filter(row => row.sourceAccountId === card.accountId || row.destinationAccountId === card.accountId).slice(0, 4)
+  return <section className={styles.activity}>
+    <div className={styles.activityHead}><h2 className={styles.panelTitle}>{t('Recent card activity', 'Остання активність')}</h2><Link className={styles.viewAll} to="/#recent-transactions">{t('View all', 'Усі операції')}</Link></div>
+    {rows.length ? <div role="table" aria-label={t('Recent card activity', 'Остання активність')}>
+      <div role="row" className={`${styles.activityGrid} ${styles.activityHeader}`}><span role="columnheader">{t('Operation', 'Операція')}</span><span role="columnheader">{t('Date', 'Дата')}</span><span role="columnheader">{t('Amount', 'Сума')}</span></div>
+      {rows.map(row => {
         const outgoing = row.sourceAccountId === card.accountId
-        return <tr key={row.id}>
-          <td><span className={styles.merchant}><Icon name={row.kind === 'Purchase' ? 'card' : row.kind === 'Exchange' ? 'exchange' : 'transfer'}/><span><strong>{transactionLabel(row.kind, t)}</strong><small>{row.status === 'Completed' ? (row.destinationIban || 'Flenta') : row.status}</small></span></span></td>
-          <td>{new Date(row.createdAt).toLocaleDateString(m.locale, { month: 'short', day: '2-digit', year: 'numeric' })}</td>
-          <td>{outgoing ? '−' : '+'}{m.format(row.amount, row.currency)}</td>
-        </tr>
-      })}</tbody>
-    </table> : <EmptyState icon={<Icon name="statement"/>} title={t('No activity yet', 'Операцій поки немає')}>{t('Payments and transfers from this card’s account will appear here.', 'Тут з’являться оплати й перекази з рахунку цієї картки.')}</EmptyState>}
+        return <div role="row" key={row.id} className={`${styles.activityGrid} ${styles.activityRow}`}>
+          <span role="cell" className={styles.merchant}><Icon name={row.kind === 'Purchase' ? 'card' : row.kind === 'Exchange' ? 'exchange' : 'transfer'}/>
+            <span><strong>{transactionLabel(row.kind, t)}</strong><small>{row.destinationIban ? `IBAN ···· ${row.destinationIban.slice(-4)}` : row.status === 'Completed' ? 'Flenta' : transactionStatus(row.status, t)}</small></span></span>
+          <span role="cell" className={styles.activityDate}>{new Date(row.createdAt).toLocaleDateString(m.locale, { month: 'short', day: '2-digit', year: 'numeric' })}</span>
+          <span role="cell" className={styles.activityAmount}>{outgoing ? '−' : '+'}{m.format(row.amount, row.currency)}</span>
+        </div>
+      })}
+    </div> : <EmptyState icon={<Icon name="statement"/>} title={t('No activity yet', 'Операцій поки немає')}>{t('Payments and transfers from this card’s account will appear here.', 'Тут з’являться оплати й перекази з рахунку цієї картки.')}</EmptyState>}
   </section>
+}
+
+function ControlRow({ label, description }: { label: string; description: string }) {
+  return <div className={styles.controlRow}>
+    <div><strong>{label}<SoonBadge/></strong><small>{description}</small></div>
+    <span className={styles.toggle} role="switch" aria-checked="false" aria-disabled="true" aria-label={label}/>
+  </div>
 }
 
 function CardControls({ model: m, card, onClose, onPurchase }: { model: DashboardModel; card: Card; onClose: () => void; onPurchase: () => void }) {
   const t = m.text
-  return <section className={ui.panel}>
-    <div className={ui.panelHeader}><h2>{t('Card controls', 'Керування карткою')}</h2></div>
-    <ToggleRow soon checked={false} label={t('Online payments', 'Онлайн-платежі')} description={t('Pay securely on the web', 'Безпечна оплата в інтернеті')}/>
-    <ToggleRow soon checked={false} label={t('Contactless payments', 'Безконтактна оплата')} description={t('Tap to pay in stores', 'Оплата дотиком у магазинах')}/>
-    <ToggleRow soon checked={false} label={t('Cash withdrawals', 'Зняття готівки')} description={t('Withdraw at any ATM', 'Зняття в будь-якому банкоматі')}/>
+  return <section className={styles.controls}>
+    <h2 className={styles.panelTitle}>{t('Card controls', 'Керування карткою')}</h2>
+    <ControlRow label={t('Online payments', 'Онлайн-платежі')} description={t('Pay securely on the web', 'Безпечна оплата в інтернеті')}/>
+    <ControlRow label={t('Contactless payments', 'Безконтактна оплата')} description={t('Tap to pay in stores', 'Оплата дотиком у магазинах')}/>
+    <ControlRow label={t('Cash withdrawals', 'Зняття готівки')} description={t('Withdraw at any ATM', 'Зняття в будь-якому банкоматі')}/>
     <div className={styles.limit}><span>{t('Monthly spending limit', 'Місячний ліміт витрат')}<SoonBadge/></span><strong>—</strong></div>
-    <button type="button" className={`${ui.button} ${ui.block} ${styles.closeCard}`} disabled={m.disabled || card.status !== 'Active'} onClick={onPurchase}><Icon name="purchase" size={16}/>{t('Try a test purchase', 'Тестова покупка')}</button>
-    <button type="button" className={`${ui.buttonDanger} ${ui.block} ${styles.closeCard}`} disabled={m.disabled || card.status === 'Closed'} onClick={onClose}>{t('Close card', 'Закрити картку')}</button>
+    <div className={styles.controlActions}>
+      <button type="button" className={ui.button} disabled={m.disabled || card.status !== 'Active'} onClick={onPurchase}>{t('Test purchase', 'Тестова покупка')}</button>
+      <button type="button" className={ui.buttonDanger} disabled={m.disabled || card.status === 'Closed'} onClick={onClose}>{t('Close card', 'Закрити картку')}</button>
+    </div>
   </section>
 }
 
@@ -72,7 +82,7 @@ export function CardsPage() {
   function open(next: CardDialog) { m.clearFeedback(); setDialog(next) }
 
   return <WorkspaceLayout section="cards" title={t('Cards', 'Картки')} subtitle={t('Your everyday spending, in one place.', 'Усі щоденні витрати в одному місці.')}
-    actions={<button type="button" className={ui.button} disabled={m.disabled} onClick={() => open('add')}><Icon name="plus" size={16}/>{t('Add new card', 'Додати картку')}</button>}>
+    actions={<button type="button" className={`${ui.button} ${styles.addButton}`} disabled={m.disabled} onClick={() => open('add')}>{`+  ${t('Add new card', 'Додати картку')}`}</button>}>
     {dialog === null && <Feedback error={m.error} notice={m.notice}/>}
     {m.loading && !m.loaded && <p className={ui.notice} role="status">{t('Loading your cards…', 'Завантажуємо картки…')}</p>}
 
@@ -91,9 +101,9 @@ export function CardsPage() {
           <div className={styles.number}>{maskedDigits(card)}</div>
           <div className={styles.bankCardBottom}><span>{holder}</span><span>{expiry(card)}</span></div>
         </section>
-        <section className={ui.panel}>
+        <section className={styles.overview}>
           <div className={styles.overviewHead}>
-            <div><h2>{card.id === primaryId ? t('Primary card', 'Основна картка') : `${t('Card', 'Картка')} •• ${lastDigits(card.maskedNumber)}`}</h2>
+            <div><h2 className={styles.overviewTitle}>{card.id === primaryId ? t('Primary card', 'Основна картка') : `${t('Card', 'Картка')} •• ${lastDigits(card.maskedNumber)}`}</h2>
               <p>{t('Virtual debit card', 'Віртуальна дебетова картка')} · {account?.currency}</p></div>
             <CardStatus card={card} model={m}/>
           </div>
@@ -103,10 +113,10 @@ export function CardsPage() {
             <dt>{t('Cardholder', 'Власник')}</dt><dd>{m.user?.displayName}</dd>
           </dl>
           <div className={styles.cardActions}>
-            <button type="button" className={ui.button} disabled={m.disabled || card.status !== 'Active'} onClick={() => open('details')}><Icon name="eye" size={16}/>{t('Show card details', 'Показати реквізити')}</button>
+            <button type="button" className={ui.button} disabled={m.disabled || card.status !== 'Active'} onClick={() => open('details')}>{t('Show card details', 'Показати реквізити')}</button>
             <button type="button" className={ui.button} disabled={m.disabled || card.status === 'Closed'} onClick={() => void m.run(() => m.bank.changeCard(card.id, card.status === 'Blocked' ? 'unblock' : 'block'),
               card.status === 'Blocked' ? t('Card unfrozen.', 'Картку розморожено.') : t('Card frozen.', 'Картку заморожено.'))}>
-              <Icon name="snowflake" size={16}/>{card.status === 'Blocked' ? t('Unfreeze card', 'Розморозити картку') : t('Freeze card', 'Заморозити картку')}
+              {card.status === 'Blocked' ? t('Unfreeze card', 'Розморозити картку') : t('Freeze card', 'Заморозити картку')}
             </button>
           </div>
         </section>
