@@ -1,0 +1,16 @@
+.grid { display: grid; grid-template-columns: minmax(0, 720fr) minmax(0, 392fr); gap: 24px; align-items: start; }
+.grid + .grid { margin-top: 24px; }
+.identity { display: flex; align-items: center; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid #3d3b4d; }
+.photo { display: grid; place-items: center; width: 64px; height: 64px; flex-shrink: 0; border-radius: 9px; background: #514571; font-size: 22px; font-weight: 600; }
+.identityText { flex: 1; min-width: 0; }
+.identityText strong { display: block; font-size: 17px; font-weight: 600; overflow-wrap: anywhere; }
+.identityText small { display: block; margin-top: 8px; color: #b9b5c9; font-size: 12px; }
+.fields { margin: 0; padding: 22px 0 0; border: 0; min-width: 0; }
+.securityRow { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; }
+.securityRow strong { display: block; font-size: 14px; font-weight: 600; }
+.securityRow small { display: block; margin-top: 6px; color: #b9b5c9; font-size: 11px; }
+.prefRow { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 56px; color: #f4f2fa; }
+.prefRow strong { font-size: 13px; font-weight: 500; }
+.prefSelect { min-width: 180px; height: 36px; padding: 0 12px; border: 1px solid #3d3b4d; border-radius: 10px; background: #30275c; color: #f4f2fa; font-size: 13px; }
+.active { margin: 16px 0 20px; color: #b8f0d5; font-size: 11px; font-weight: 500; }
+@media (max-width: 1100px) { .grid { grid-template-columns: minmax(0, 1fr); } .identity { flex-wrap: wrap; } }
