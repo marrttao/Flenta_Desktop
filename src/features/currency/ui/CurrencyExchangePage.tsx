@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useDashboard } from '../../dashboard/model/useDashboard'
+import { useDashboard, type Account } from '../../dashboard/model/useDashboard'
 import { bankingError, parseAmount } from '../../banking/utils/banking.js'
 import { financeApi } from '../../finance/api/financeApi.js'
 import { WorkspaceLayout } from '../../workspace/ui/WorkspaceLayout'
@@ -9,11 +9,19 @@ import { Icon } from '../../workspace/ui/Icon'
 import ui from '../../workspace/ui/Workspace.module.css'
 import { RateChart } from './RateChart'
 import styles from './Exchange.module.css'
+import flagUah from './assets/flag-uah.png'
+import flagUsd from './assets/flag-usd.png'
 
 interface Rates { date: string; uahPerUnit: Record<string, number> }
 interface ExchangeQuote {
   id: string; sourceCurrency: string; destinationCurrency: string; amount: number; receivedAmount: number
   rate: number; rateDate: string; fee: number; expiresAt: string
+}
+
+const flags: Record<string, string> = { UAH: flagUah, USD: flagUsd }
+
+function Flag({ currency }: { currency: string }) {
+  return flags[currency] ? <img className={styles.flag} src={flags[currency]} width={30} height={20} alt={currency}/> : <span className={styles.flagCode}>{currency}</span>
 }
 
 function uahPer(rates: Rates | null, currency: string) {
@@ -73,61 +81,62 @@ export function CurrencyExchangePage() {
     if (await m.run(() => m.operation('/api/finance/exchanges', { quoteId: quote.id }), t('Exchange completed.', 'Обмін виконано.'))) { setQuote(null); setAmount('') }
   }
 
-  return <WorkspaceLayout section="exchange" title={t('Currency exchange', 'Обмін валют')} subtitle={t('Move money between your currency accounts at the official rate.', 'Переводь кошти між валютними рахунками за офіційним курсом.')}>
+  const pickerLabel = (account: Account) => `${account.currency} · …${account.iban.slice(-6)} · ${m.format(account.balance, account.currency)}`
+
+  return <WorkspaceLayout section="exchange" title={t('Currency exchange', 'Обмін валют')}>
     <Feedback error={m.error} notice={m.notice}/>
-    {m.loaded && targets.length === 0 && <p className={ui.notice}>{t('You need accounts in two different currencies.', 'Потрібні рахунки у двох різних валютах.')} <Link to="/">{t('Open a USD or EUR account on Home.', 'Відкрий рахунок у USD або EUR на головній.')}</Link></p>}
+    {m.loaded && targets.length === 0 && <p className={ui.notice}>{t('You need accounts in two different currencies.', 'Потрібні рахунки у двох різних валютах.')} <Link to="/cards">{t('Open a USD or EUR account on Cards.', 'Відкрий рахунок у USD або EUR на сторінці «Картки».')}</Link></p>}
 
     <div className={styles.pair}>
       <section className={`${styles.side} ${styles.sideFrom}`}>
-        <div className={styles.sideHead}><h2>{t('From account', 'З рахунку')}</h2>{source && <span className={styles.currencyBadge}>{source.currency}</span>}</div>
+        <div className={styles.sideHead}><h2 className={styles.sideTitle}>{t('From card', 'З картки')}</h2>
+          {source && <label className={styles.flagPicker} title={t('Change account', 'Змінити рахунок')}><Flag currency={source.currency}/>
+            <select aria-label={t('Account to exchange from', 'Рахунок списання')} value={source.id} disabled={m.disabled} onChange={e => choose({ source: e.target.value, destination: '' })}>
+              {m.accounts.map(a => <option key={a.id} value={a.id}>{pickerLabel(a)}</option>)}
+            </select></label>}
+        </div>
         <p className={styles.balance}>{source ? m.format(source.balance, source.currency) : '—'}</p>
-        <label className={ui.field}>{t('Account', 'Рахунок')}
-          <select value={source?.id || ''} disabled={m.disabled || !m.accounts.length} onChange={e => choose({ source: e.target.value, destination: '' })}>
-            {m.accounts.map(a => <option key={a.id} value={a.id}>{a.currency} · …{a.iban.slice(-6)}</option>)}
-          </select>
-        </label>
-        <label className={ui.field}>{t('Choice of amount', 'Сума обміну')}
-          <input value={amount} inputMode="decimal" placeholder="0,00" autoComplete="off" disabled={m.disabled || !destination} onChange={e => { setAmount(e.target.value); setQuote(null) }}/>
-        </label>
+        <label className={styles.amountLabel} htmlFor="exchange-amount">{t('Choice of amount', 'Сума обміну')}</label>
+        <div className={styles.amountField}>
+          <input id="exchange-amount" value={amount} inputMode="decimal" placeholder="0,00" autoComplete="off" disabled={m.disabled || !destination} onChange={e => { setAmount(e.target.value); setQuote(null) }}/>
+          {source && <Flag currency={source.currency}/>}
+        </div>
       </section>
       <button type="button" className={styles.swap} disabled={m.disabled || !destination} aria-label={t('Swap accounts', 'Поміняти рахунки місцями')}
-        onClick={() => destination && source && choose({ source: destination.id, destination: source.id })}><Icon name="swap"/></button>
+        onClick={() => destination && source && choose({ source: destination.id, destination: source.id })}><Icon name="swap" size={30}/></button>
       <section className={styles.side}>
-        <div className={styles.sideHead}><h2>{t('To account', 'На рахунок')}</h2>{destination && <span className={styles.currencyBadge}>{destination.currency}</span>}</div>
+        <div className={styles.sideHead}><h2 className={styles.sideTitle}>{t('To card', 'На картку')}</h2>
+          {destination && <label className={styles.flagPicker} title={t('Change account', 'Змінити рахунок')}><Flag currency={destination.currency}/>
+            <select aria-label={t('Account to exchange to', 'Рахунок зарахування')} value={destination.id} disabled={m.disabled} onChange={e => choose({ destination: e.target.value })}>
+              {targets.map(a => <option key={a.id} value={a.id}>{pickerLabel(a)}</option>)}
+            </select></label>}
+        </div>
         <p className={styles.balance}>{destination ? m.format(destination.balance, destination.currency) : '—'}</p>
-        <label className={ui.field}>{t('Account', 'Рахунок')}
-          <select value={destination?.id || ''} disabled={m.disabled || !targets.length} onChange={e => choose({ destination: e.target.value })}>
-            {!targets.length && <option value="">{t('No account in another currency', 'Немає рахунку в іншій валюті')}</option>}
-            {targets.map(a => <option key={a.id} value={a.id}>{a.currency} · …{a.iban.slice(-6)}</option>)}
-          </select>
-        </label>
-        <div className={ui.field}>{t('You receive', 'Ти отримаєш')}
-          <div className={styles.received} aria-live="polite">{quote ? m.format(quote.receivedAmount, quote.destinationCurrency) : '—'}</div>
+        <span className={styles.amountLabel}>{t('Choice of amount', 'Сума обміну')}</span>
+        <div className={styles.amountField} aria-live="polite">
+          <output>{quote ? new Intl.NumberFormat('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(quote.receivedAmount) : '—'}</output>
+          {destination && <Flag currency={destination.currency}/>}
         </div>
       </section>
     </div>
 
-    <section className={styles.rates} aria-labelledby="exchange-rates-title">
-      <div>
-        <h2 id="exchange-rates-title" className={styles.ratesTitle}>{t('Exchange rate of money', 'Курси валют')}</h2>
+    <h2 className={styles.ratesTitle}>{t('Exchange rate of money', 'Курс валют')}</h2>
+    <section className={styles.rates} aria-label={t('Exchange rate of money', 'Курс валют')}>
+      <div className={styles.chartArea}>
         {ratesError ? <p role="alert" className={`${ui.feedback} ${ui.feedbackError}`}>{ratesError}</p>
-          : bars.length ? <RateChart bars={bars} format={rateNumber} caption={`${t('UAH per unit · NBU', 'Гривень за одиницю · НБУ')} · ${rates?.date}`}/>
+          : bars.length ? <RateChart bars={bars} format={rateNumber} caption={`${t('UAH rate', 'Курс UAH')} · NBU ${rates?.date}`}/>
             : <p className={ui.notice} role="status">{t('Loading rates…', 'Завантажуємо курси…')}</p>}
       </div>
-      <div className={`${ui.panel} ${styles.quote}`}>
-        <p className={styles.rate}>{base && counter && pairRate ? `1 ${base.currency} = ${rateNumber(pairRate)} ${counter.currency}` : t('Choose two currencies', 'Обери дві валюти')}</p>
+      <div className={styles.quote}>
+        <p className={styles.rate}>{base && counter && pairRate ? `1 ${base.currency} = ${rateNumber(pairRate)} ${counter.currency}` : '—'}</p>
         <dl className={styles.terms}>
           <dt>{t('Limits', 'Ліміти')}<SoonBadge/></dt><dd>—</dd>
           <dt>{t('Commission', 'Комісія')}</dt><dd>{quote ? m.format(quote.fee, quote.sourceCurrency) : '—'}</dd>
-          <dt>{t('Quoted rate', 'Курс розрахунку')}</dt><dd>{quote ? `${rateNumber(quote.rate)} · ${quote.rateDate}` : '—'}</dd>
         </dl>
-        <div className={styles.quoteActions}>
-          {quote && (expired ? <span className={styles.expired} role="status">{t('This quote has expired. Review the exchange again.', 'Розрахунок застарів. Розрахуй обмін ще раз.')}</span>
-            : <span className={ui.small + ' ' + ui.muted}>{t('Quote valid for', 'Розрахунок дійсний ще')} {secondsLeft} {t('s', 'с')}</span>)}
-          {quote && !expired
-            ? <button type="button" className={ui.buttonPrimary} disabled={m.disabled} onClick={() => void confirm()}>{t('Confirm exchange', 'Підтвердити обмін')} · {m.format(quote.amount, quote.sourceCurrency)}</button>
-            : <button type="button" className={ui.buttonPrimary} disabled={m.disabled || !destination || !amount} onClick={() => void review()}>{t('Review exchange', 'Розрахувати обмін')}</button>}
-        </div>
+        {quote && expired && <span className={styles.expired} role="status">{t('This quote has expired. Review the exchange again.', 'Розрахунок застарів. Розрахуй обмін ще раз.')}</span>}
+        {quote && !expired
+          ? <button type="button" className={`${ui.buttonPrimary} ${styles.action}`} disabled={m.disabled} onClick={() => void confirm()}>{t('Confirm exchange', 'Підтвердити обмін')} · {secondsLeft} {t('s', 'с')}</button>
+          : <button type="button" className={`${ui.buttonPrimary} ${styles.action}`} disabled={m.disabled || !destination || !amount} onClick={() => void review()}>{t('Review exchange', 'Розрахувати обмін')}</button>}
       </div>
     </section>
   </WorkspaceLayout>

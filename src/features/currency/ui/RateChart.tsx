@@ -8,7 +8,7 @@ export function RateChart({ bars, caption, format }: { bars: RateBar[]; caption:
   const ceiling = Math.ceil(max / 10) * 10 || 10
   const ticks = [1, 0.8, 0.6, 0.4, 0.2, 0].map(step => Math.round(ceiling * step))
   return <figure className={styles.chart}>
-    <div className={styles.chartArea}>
+    <div className={styles.chartGrid}>
       <div className={styles.axis} aria-hidden="true">{ticks.map(tick => <span key={tick}>{tick}</span>)}</div>
       <div className={styles.bars} role="list">
         {bars.map(bar => <div key={bar.currency} role="listitem" className={styles.barSlot} aria-label={`${bar.currency}: ${format(bar.value)}`}>
