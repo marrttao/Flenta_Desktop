@@ -1,0 +1,25 @@
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 508px); align-items: center; gap: 24px; padding: 29px 28px; }
+.hero h2 { font-size: 28px; font-weight: 600; }
+.hero p { margin: 14px 0 0; font-size: 14px; }
+.heroSearch { display: flex; align-items: center; gap: 14px; height: 56px; padding: 0 18px; border: 1px solid #3d3b4d; border-radius: 12px; background: #30275c; color: #b9b5c9; }
+.heroSearch input { flex: 1; min-width: 0; height: 100%; border: 0; background: transparent; color: #f4f2fa; font-size: 13px; }
+.heroSearch input::placeholder { color: #b9b5c9; }
+.heroSearch input:focus-visible { outline: none; }
+.heroSearch:focus-within { border-color: #a99aff; }
+.grid { display: grid; grid-template-columns: minmax(0, 720fr) minmax(0, 392fr); gap: 24px; margin-top: 24px; align-items: start; }
+.side { display: grid; gap: 24px; }
+.topics { margin-bottom: 22px; padding-bottom: 22px; border-bottom: 1px solid #3d3b4d; }
+.topics button { min-width: 116px; }
+.faq { display: grid; }
+.faqItem { border-bottom: 1px solid #3d3b4d; }
+.faqItem:last-child { border-bottom: 0; }
+.faqQuestion { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; padding: 17px 0; border: 0; background: transparent; color: #f4f2fa; font-size: 14px; font-weight: 500; text-align: left; }
+.faqQuestion[aria-expanded='true'] { font-size: 15px; font-weight: 600; }
+.faqQuestion span:last-child { color: #a99aff; font-size: 22px; font-weight: 400; line-height: 1; }
+.faqAnswer { margin: -4px 0 0; padding: 0 52px 20px 0; color: #b9b5c9; font-size: 13px; line-height: 1.4; }
+.contact { display: grid; gap: 16px; }
+.contact p { margin: -6px 0 6px; color: #b9b5c9; font-size: 13px; }
+.status { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px; border-radius: 20px; background: #2c3e3b; color: #b8f0d5; font-size: 11px; font-weight: 500; }
+.statusDown { background: #4a2935; color: #ffd6de; }
+.statusUnknown { background: #332c54; color: #b9b5c9; }
+@media (max-width: 1100px) { .hero, .grid { grid-template-columns: minmax(0, 1fr); } }
