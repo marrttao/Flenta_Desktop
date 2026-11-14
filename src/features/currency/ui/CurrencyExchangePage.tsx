@@ -47,13 +47,15 @@ export function CurrencyExchangePage() {
   const destination = m.accounts.find(a => a.id === pick.destination && a.id !== source?.id && a.currency !== source?.currency)
     ?? m.accounts.find(a => a.currency !== source?.currency)
   const targets = m.accounts.filter(a => a.currency !== source?.currency)
-  const fromRate = source && uahPer(rates, source.currency)
-  const toRate = destination && uahPer(rates, destination.currency)
-  const pairRate = fromRate && toRate ? fromRate / toRate : null
+  // Quote the foreign currency against the other side, as in the design ("1 USD = 45,24 UAH").
+  const [base, counter] = source?.currency === 'UAH' ? [destination, source] : [source, destination]
+  const baseRate = base && uahPer(rates, base.currency)
+  const counterRate = counter && uahPer(rates, counter.currency)
+  const pairRate = baseRate && counterRate ? baseRate / counterRate : null
   const expired = quote ? now >= Date.parse(quote.expiresAt) : false
   const secondsLeft = quote ? Math.max(0, Math.round((Date.parse(quote.expiresAt) - now) / 1000)) : 0
   const bars = Object.entries(rates?.uahPerUnit ?? {}).map(([currency, value]) => ({ currency, value })).sort((a, b) => b.value - a.value).slice(0, 8)
-  const rateNumber = (value: number) => new Intl.NumberFormat(m.locale, { maximumFractionDigits: 4 }).format(value)
+  const rateNumber = (value: number) => new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 4 }).format(value)
 
   function choose(next: Partial<typeof pick>) { setPick(current => ({ ...current, ...next })); setQuote(null) }
 
@@ -113,7 +115,7 @@ export function CurrencyExchangePage() {
             : <p className={ui.notice} role="status">{t('Loading rates…', 'Завантажуємо курси…')}</p>}
       </div>
       <div className={`${ui.panel} ${styles.quote}`}>
-        <p className={styles.rate}>{source && destination && pairRate ? `1 ${source.currency} = ${rateNumber(pairRate)} ${destination.currency}` : t('Choose two currencies', 'Обери дві валюти')}</p>
+        <p className={styles.rate}>{base && counter && pairRate ? `1 ${base.currency} = ${rateNumber(pairRate)} ${counter.currency}` : t('Choose two currencies', 'Обери дві валюти')}</p>
         <dl className={styles.terms}>
           <dt>{t('Limits', 'Ліміти')}<SoonBadge/></dt><dd>—</dd>
           <dt>{t('Commission', 'Комісія')}</dt><dd>{quote ? m.format(quote.fee, quote.sourceCurrency) : '—'}</dd>
