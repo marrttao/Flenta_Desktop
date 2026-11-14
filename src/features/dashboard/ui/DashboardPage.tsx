@@ -1,9 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useDashboard, type DashboardModel, type Transaction } from '../model/useDashboard'
 import { bankingError, parseAmount } from '../../banking/utils/banking.js'
 import { DashboardLayout, Dialog, Feedback, Icon } from './DashboardLayout'
 import { CardsPanel } from './CardsPanel'
-import { TransfersPanel } from './TransfersPanel'
 import { SavingsPanel } from './SavingsPanel'
 import styles from './Dashboard.module.css'
 
@@ -60,9 +60,10 @@ function Spending({ model: m }: { model: DashboardModel }) {
 export function DashboardPage() {
   const m = useDashboard()
   const t = m.text
+  const navigate = useNavigate()
   const quickActions = [
     { icon: 'wallet' as const, title: t('Top up', 'Поповнення'), description: t('Add virtual funds to your account', 'Додай віртуальні кошти на рахунок'), action: () => m.setAction('topup'), disabled: m.disabled },
-    { icon: 'transfer' as const, title: t('Transfer', 'Переказ'), description: t('Send money between accounts', 'Переказуй між рахунками'), action: () => m.setAction('transfer'), disabled: m.disabled },
+    { icon: 'transfer' as const, title: t('Transfer', 'Переказ'), description: t('Send money between accounts', 'Переказуй між рахунками'), action: () => navigate('/transfers'), disabled: false },
     { icon: 'statement' as const, title: t('Statement', 'Виписка'), description: t('Export this transaction page as CSV', 'Експортуй цю сторінку операцій у CSV'), action: () => exportPage(m), disabled: !m.transactions.length },
     { icon: 'purchase' as const, title: t('Card payment', 'Оплата карткою'), description: t('Try a virtual purchase and round-ups', 'Спробуй тестову покупку та округлення'), action: () => m.setAction('purchase'), disabled: m.disabled || !m.cards.some(c => c.status === 'Active') },
     { icon: 'plus' as const, title: t('New account', 'Новий рахунок'), description: t('Keep UAH, USD and EUR separately', 'Тримай UAH, USD та EUR окремо'), action: () => m.setAction('accounts'), disabled: m.disabled },
@@ -73,7 +74,7 @@ export function DashboardPage() {
       {quickActions.map(action => <button key={action.icon} type="button" disabled={action.disabled} onClick={action.action}><span className={styles.actionIcon}><Icon name={action.icon}/></span><span><strong>{action.title}</strong><small>{action.description}</small></span><Icon name="arrow"/></button>)}
       <a href="#dashboard-savings"><span className={styles.actionIcon}><Icon name="savings"/></span><span><strong>{t('Piggy bank', 'Накопичення')}</strong><small>{t('Save for your goals', 'Відкладай на свої цілі')}</small></span><Icon name="arrow"/></a>
     </div></section></div>
-    <SavingsPanel model={m}/><TransfersPanel model={m}/>
+    <SavingsPanel model={m}/>
     {m.action === 'purchase' && <Dialog title={t('Try a virtual purchase', 'Спробувати тестову покупку')} onClose={() => { if (!m.busy) m.setAction(null) }}>
       <p className={styles.muted}>{t('This sandbox payment can trigger cashback and the savings rules you configured. Savings contributions are charged in addition to the purchase.', 'Ця тестова покупка може нарахувати кешбек і застосувати твої правила накопичення. Відрахування списується додатково до покупки.')}</p><Feedback model={m}/>
       <form onSubmit={async e => {
@@ -81,9 +82,6 @@ export function DashboardPage() {
         if (await m.run(() => m.operation('/api/finance/purchases', { cardId: data.get('cardId'), amount: parseAmount(data.get('amount')) }), t('Virtual purchase completed.', 'Тестову покупку оплачено.'))) m.setAction(null)
       }}><fieldset disabled={m.disabled}><label>{t('Card', 'Картка')}<select name="cardId" defaultValue={m.activeCard?.status === 'Active' ? m.activeCard.id : undefined} required>{m.cards.filter(c => c.status === 'Active').map(c => <option key={c.id} value={c.id}>{c.maskedNumber} · {m.accounts.find(a => a.id === c.accountId)?.currency}</option>)}</select></label>
         <label>{t('Amount in the card account currency', 'Сума у валюті рахунку картки')}<input name="amount" inputMode="decimal" required/></label><button className={styles.primary} type="submit">{t('Pay with virtual funds', 'Оплатити віртуальними коштами')}</button></fieldset></form>
-    </Dialog>}
-    {m.action === 'help' && <Dialog title={t('A little help with Flenta', 'Допомога з Flenta')} onClose={() => m.setAction(null)}>
-      <p>{t('Open an account, add virtual funds and create a card. Review transfer fees before confirming. To save automatically, create a savings goal and choose Round-ups or Percentage in its settings.', 'Відкрий рахунок, додай віртуальні кошти та створи картку. Перевір комісію перед підтвердженням переказу. Для автоматичного накопичення створи ціль та обери округлення або відсоток у її налаштуваннях.')}</p><p className={styles.muted}>{t('All operations in this banking sandbox are virtual. KYC is still required for account access.', 'Усі операції в цій банківській пісочниці віртуальні. Для доступу до облікового запису потрібна перевірка KYC.')}</p>
     </Dialog>}
   </DashboardLayout>
 }

@@ -19,7 +19,7 @@ export interface Goal {
 }
 export interface Analytics { currencies: { currency: string; expenses: number; purchases: number }[] }
 export interface TransferQuote { amount: number; fee: number; total: number; currency: string; sufficientFunds: boolean }
-export type DashboardAction = 'topup' | 'transfer' | 'accounts' | 'cards' | 'purchase' | 'help' | null
+export type DashboardAction = 'topup' | 'accounts' | 'purchase' | null
 const empty = { accounts: [] as Account[], cards: [] as Card[], transactions: [] as Transaction[] }
 
 export function useDashboard() {
