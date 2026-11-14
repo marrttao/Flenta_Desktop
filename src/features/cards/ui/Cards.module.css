@@ -32,7 +32,8 @@
 .merchant strong { font-weight: 600; }
 .limit { display: flex; justify-content: space-between; gap: 12px; padding-top: 18px; border-top: 1px solid #3d3b4d; color: #b9b5c9; font-size: 12px; }
 .limit strong { color: #f4f2fa; font-size: 13px; font-weight: 600; }
-.closeCard { margin-top: 20px; }
+.closeCard { margin-top: 12px; }
+.closeCard:first-of-type { margin-top: 20px; }
 .requisites { display: grid; gap: 6px; margin: 22px 0; }
 .requisites dt { color: #b9b5c9; font-size: 12px; }
 .requisites dd { margin: 0 0 12px; font-size: 20px; letter-spacing: .03em; }

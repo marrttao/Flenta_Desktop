@@ -75,7 +75,7 @@ function describeDevice(agent: string, t: WorkspaceText['text']) {
   return system ? `${browser} ${t('on', 'на')} ${system}` : browser
 }
 
-export function DevicesPanel({ text: { text: t } }: { text: WorkspaceText }) {
+export function DevicesPanel({ text: { text: t }, signingOut, onSignOut }: { text: WorkspaceText; signingOut: boolean; onSignOut: () => void }) {
   return <section className={ui.panel}>
     <div className={ui.panelHeader}><h2>{t('Devices and sessions', 'Пристрої та сесії')}</h2></div>
     <div className={ui.row}>
@@ -84,5 +84,6 @@ export function DevicesPanel({ text: { text: t } }: { text: WorkspaceText }) {
     </div>
     <p className={styles.active}>●&nbsp; {t('Active now', 'Активна зараз')}</p>
     <button type="button" className={`${ui.button} ${ui.block}`} disabled>{t('Manage devices', 'Керувати пристроями')}<SoonBadge/></button>
+    <button type="button" className={`${ui.buttonDanger} ${ui.block} ${styles.signOut}`} disabled={signingOut} onClick={onSignOut}><Icon name="logout" size={18}/>{t('Sign out', 'Вийти')}</button>
   </section>
 }

@@ -14,3 +14,4 @@
 .prefSelect { min-width: 180px; height: 36px; padding: 0 12px; border: 1px solid #3d3b4d; border-radius: 10px; background: #30275c; color: #f4f2fa; font-size: 13px; }
 .active { margin: 16px 0 20px; color: #b8f0d5; font-size: 11px; font-weight: 500; }
 @media (max-width: 1100px) { .grid { grid-template-columns: minmax(0, 1fr); } .identity { flex-wrap: wrap; } }
+.signOut { margin-top: 12px; }

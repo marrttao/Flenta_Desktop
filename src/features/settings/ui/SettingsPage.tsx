@@ -12,13 +12,14 @@ import { DevicesPanel, PersonalInfoPanel, PreferencesPanel, PROFILE_FORM_ID, Sec
 import styles from './Settings.module.css'
 
 export function SettingsPage() {
-  const { user, request, updateUser } = useAuth()
+  const { user, request, updateUser, logout } = useAuth()
   const { status } = useKyc()
   const text = useWorkspaceText()
   const t = text.text
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [signingOut, setSigningOut] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -35,6 +36,12 @@ export function SettingsPage() {
     finally { setBusy(false) }
   }
 
+  async function signOut() {
+    setSigningOut(true); setError('')
+    try { await logout() } catch { setError(t('Signed out locally. The server did not confirm sign-out.', 'Локальну сесію завершено. Сервер не підтвердив вихід.')) }
+    finally { setSigningOut(false) }
+  }
+
   if (!user) return null
   return <WorkspaceLayout section="settings" title={t('Settings', 'Налаштування')} subtitle={t('Make Flenta feel like you.', 'Зроби Flenta зручною для себе.')}
     actions={<button type="submit" form={PROFILE_FORM_ID} className={ui.button} disabled={busy}>{busy ? t('Saving…', 'Зберігаємо…') : t('Save changes', 'Зберегти зміни')}</button>}>
@@ -45,7 +52,7 @@ export function SettingsPage() {
     </div>
     <div className={styles.grid}>
       <PreferencesPanel text={text}/>
-      <DevicesPanel text={text}/>
+      <DevicesPanel text={text} signingOut={signingOut} onSignOut={() => void signOut()}/>
     </div>
   </WorkspaceLayout>
 }

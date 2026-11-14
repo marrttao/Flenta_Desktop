@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Account, Card, DashboardModel } from '../../dashboard/model/useDashboard'
-import { bankingError } from '../../banking/utils/banking.js'
+import { bankingError, parseAmount } from '../../banking/utils/banking.js'
 import { Dialog } from '../../workspace/ui/Dialog'
 import { Feedback } from '../../workspace/ui/WorkspaceControls'
 import ui from '../../workspace/ui/Workspace.module.css'
@@ -10,25 +10,42 @@ interface CardSecrets { number: string; cvv: string; expiryMonth: number; expiry
 
 export function AddCardDialog({ model: m, onCreated, onClose }: { model: DashboardModel; onCreated: (card: Card) => void; onClose: () => void }) {
   const t = m.text
-  const hasAccounts = m.accounts.length > 0
   return <Dialog title={t('Add a new card', 'Додати нову картку')} onClose={() => { if (!m.busy) onClose() }}>
-    <p className={ui.muted}>{t('Virtual debit cards are free and linked to one of your accounts.', 'Віртуальні дебетові картки безкоштовні та прив’язані до одного з твоїх рахунків.')}</p>
+    <p className={ui.muted}>{t('Virtual debit cards are free. Link the card to one of your accounts or open a new account in another currency.', 'Віртуальні дебетові картки безкоштовні. Прив’яжи картку до свого рахунку або відкрий новий рахунок в іншій валюті.')}</p>
     <Feedback error={m.error}/>
     <form onSubmit={async event => {
-      event.preventDefault(); const data = new FormData(event.currentTarget)
+      event.preventDefault(); const choice = String(new FormData(event.currentTarget).get('account'))
       const result: { card?: Card } = {}
       const ok = await m.run(async () => {
-        const accountId = hasAccounts ? String(data.get('accountId'))
-          : (await m.finance.openAccount(m.request, String(data.get('currency'))) as Account).id
+        const accountId = choice.startsWith('new:')
+          ? (await m.finance.openAccount(m.request, choice.slice(4)) as Account).id : choice
         result.card = await m.bank.createCard(accountId) as Card
         return result.card
       }, t('Virtual card created.', 'Віртуальну картку створено.'))
       if (ok && result.card) onCreated(result.card)
     }}><fieldset disabled={m.disabled}>
-      {hasAccounts
-        ? <label>{t('Account for the new card', 'Рахунок для нової картки')}<select name="accountId" required defaultValue={m.activeAccount?.id}>{m.accounts.map(a => <option key={a.id} value={a.id}>{a.currency} · …{a.iban.slice(-6)} · {m.format(a.balance, a.currency)}</option>)}</select></label>
-        : <label>{t('Open an account in', 'Відкрити рахунок у валюті')}<select name="currency"><option>UAH</option><option>USD</option><option>EUR</option></select></label>}
-      <button className={ui.buttonPrimary} type="submit">{m.busy ? t('Processing…', 'Обробка…') : hasAccounts ? t('Create virtual card', 'Створити віртуальну картку') : t('Open account and create card', 'Відкрити рахунок і створити картку')}</button>
+      <label>{t('Account for the new card', 'Рахунок для нової картки')}<select name="account" required defaultValue={m.activeAccount?.id || 'new:UAH'}>
+        {m.accounts.length > 0 && <optgroup label={t('My accounts', 'Мої рахунки')}>{m.accounts.map(a => <option key={a.id} value={a.id}>{a.currency} · …{a.iban.slice(-6)} · {m.format(a.balance, a.currency)}</option>)}</optgroup>}
+        <optgroup label={t('Open a new account', 'Відкрити новий рахунок')}>{['UAH', 'USD', 'EUR'].map(currency => <option key={currency} value={`new:${currency}`}>{t('New account in', 'Новий рахунок у')} {currency}</option>)}</optgroup>
+      </select></label>
+      <button className={ui.buttonPrimary} type="submit">{m.busy ? t('Processing…', 'Обробка…') : t('Create virtual card', 'Створити віртуальну картку')}</button>
+    </fieldset></form>
+  </Dialog>
+}
+
+export function TestPurchaseDialog({ model: m, card, onClose }: { model: DashboardModel; card: Card; onClose: () => void }) {
+  const t = m.text
+  const currency = m.accounts.find(a => a.id === card.accountId)?.currency
+  return <Dialog title={t('Try a virtual purchase', 'Спробувати тестову покупку')} onClose={() => { if (!m.busy) onClose() }}>
+    <p className={ui.muted}>{t('This sandbox payment can trigger cashback and the savings rules you configured. Savings contributions are charged in addition to the purchase.', 'Ця тестова покупка може нарахувати кешбек і застосувати твої правила накопичення. Відрахування списується додатково до покупки.')}</p>
+    <Feedback error={m.error}/>
+    <form onSubmit={async event => {
+      event.preventDefault(); const data = new FormData(event.currentTarget)
+      if (await m.run(() => m.operation('/api/finance/purchases', { cardId: card.id, amount: parseAmount(data.get('amount')) }), t('Virtual purchase completed.', 'Тестову покупку оплачено.'))) onClose()
+    }}><fieldset disabled={m.disabled}>
+      <p>{card.maskedNumber} · {currency}</p>
+      <label>{t('Amount in the card account currency', 'Сума у валюті рахунку картки')}<input name="amount" inputMode="decimal" required autoFocus/></label>
+      <button className={ui.buttonPrimary} type="submit">{t('Pay with virtual funds', 'Оплатити віртуальними коштами')}</button>
     </fieldset></form>
   </Dialog>
 }

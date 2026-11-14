@@ -6,10 +6,10 @@ import { WorkspaceLayout } from '../../workspace/ui/WorkspaceLayout'
 import { EmptyState, Feedback, SoonBadge, StatusChip, ToggleRow } from '../../workspace/ui/WorkspaceControls'
 import { Icon } from '../../workspace/ui/Icon'
 import ui from '../../workspace/ui/Workspace.module.css'
-import { AddCardDialog, CardDetailsDialog, CloseCardDialog } from './CardDialogs'
+import { AddCardDialog, CardDetailsDialog, CloseCardDialog, TestPurchaseDialog } from './CardDialogs'
 import styles from './Cards.module.css'
 
-type CardDialog = 'add' | 'details' | 'close' | null
+type CardDialog = 'add' | 'details' | 'close' | 'purchase' | null
 
 function maskedDigits(card: Card | undefined) {
   return `••••  ••••  ••••  ${card ? lastDigits(card.maskedNumber) : '••••'}`
@@ -38,7 +38,7 @@ function CardActivity({ model: m, card }: { model: DashboardModel; card: Card })
         const outgoing = row.sourceAccountId === card.accountId
         return <tr key={row.id}>
           <td><span className={styles.merchant}><Icon name={row.kind === 'Purchase' ? 'card' : row.kind === 'Exchange' ? 'exchange' : 'transfer'}/><span><strong>{transactionLabel(row.kind, t)}</strong><small>{row.status === 'Completed' ? (row.destinationIban || 'Flenta') : row.status}</small></span></span></td>
-          <td>{new Date(row.createdAt).toLocaleDateString(m.locale, { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+          <td>{new Date(row.createdAt).toLocaleDateString(m.locale, { month: 'short', day: '2-digit', year: 'numeric' })}</td>
           <td>{outgoing ? '−' : '+'}{m.format(row.amount, row.currency)}</td>
         </tr>
       })}</tbody>
@@ -46,7 +46,7 @@ function CardActivity({ model: m, card }: { model: DashboardModel; card: Card })
   </section>
 }
 
-function CardControls({ model: m, card, onClose }: { model: DashboardModel; card: Card; onClose: () => void }) {
+function CardControls({ model: m, card, onClose, onPurchase }: { model: DashboardModel; card: Card; onClose: () => void; onPurchase: () => void }) {
   const t = m.text
   return <section className={ui.panel}>
     <div className={ui.panelHeader}><h2>{t('Card controls', 'Керування карткою')}</h2></div>
@@ -54,6 +54,7 @@ function CardControls({ model: m, card, onClose }: { model: DashboardModel; card
     <ToggleRow soon checked={false} label={t('Contactless payments', 'Безконтактна оплата')} description={t('Tap to pay in stores', 'Оплата дотиком у магазинах')}/>
     <ToggleRow soon checked={false} label={t('Cash withdrawals', 'Зняття готівки')} description={t('Withdraw at any ATM', 'Зняття в будь-якому банкоматі')}/>
     <div className={styles.limit}><span>{t('Monthly spending limit', 'Місячний ліміт витрат')}<SoonBadge/></span><strong>—</strong></div>
+    <button type="button" className={`${ui.button} ${ui.block} ${styles.closeCard}`} disabled={m.disabled || card.status !== 'Active'} onClick={onPurchase}><Icon name="purchase" size={16}/>{t('Try a test purchase', 'Тестова покупка')}</button>
     <button type="button" className={`${ui.buttonDanger} ${ui.block} ${styles.closeCard}`} disabled={m.disabled || card.status === 'Closed'} onClick={onClose}>{t('Close card', 'Закрити картку')}</button>
   </section>
 }
@@ -112,7 +113,7 @@ export function CardsPage() {
       </div>
       <div className={styles.lower}>
         <CardActivity model={m} card={card}/>
-        <CardControls model={m} card={card} onClose={() => open('close')}/>
+        <CardControls model={m} card={card} onClose={() => open('close')} onPurchase={() => open('purchase')}/>
       </div>
     </> : m.loaded && <section className={ui.panel}>
       <EmptyState icon={<Icon name="card"/>} title={t('No cards yet', 'Карток поки немає')}>{t('Create a free virtual debit card to start paying.', 'Створи безкоштовну віртуальну дебетову картку, щоб почати платити.')}</EmptyState>
@@ -121,5 +122,6 @@ export function CardsPage() {
     {dialog === 'add' && <AddCardDialog model={m} onClose={() => setDialog(null)} onCreated={created => { setSelectedId(created.id); setDialog(null) }}/>}
     {dialog === 'details' && card && <CardDetailsDialog model={m} card={card} onClose={() => setDialog(null)}/>}
     {dialog === 'close' && card && <CloseCardDialog model={m} card={card} onClose={() => setDialog(null)}/>}
+    {dialog === 'purchase' && card && <TestPurchaseDialog model={m} card={card} onClose={() => setDialog(null)}/>}
   </WorkspaceLayout>
 }
