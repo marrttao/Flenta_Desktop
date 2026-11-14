@@ -38,31 +38,35 @@ function SupportContent({ initialQuery }: { initialQuery: string }) {
     { id: 'transfers', label: t('Transfers', 'Перекази') }, { id: 'account', label: t('Account', 'Обліковий запис') },
   ]
   return <>
-    <section className={`${ui.panel} ${ui.panelHighlight} ${styles.hero}`}>
-      <div><h2>{t('How can we help?', 'Чим допомогти?')}</h2><p>{t('Find answers and get back to what matters.', 'Знайди відповідь і повертайся до важливого.')}</p></div>
+    <section className={styles.hero}>
+      <div><h2 className={styles.heroTitle}>{t('How can we help?', 'Чим допомогти?')}</h2><p>{t('Find answers and get back to what matters.', 'Знайди відповідь і повертайся до важливого.')}</p></div>
       <label className={styles.heroSearch}><Icon name="search" size={18}/><span className={ui.srOnly}>{t('Search questions', 'Пошук питань')}</span>
         <input type="search" value={query} maxLength={100} onChange={e => setQuery(e.target.value)} placeholder={t('Search questions, topics or keywords', 'Шукай питання, теми або ключові слова')}/>
       </label>
     </section>
     <div className={styles.grid}>
-      <section className={ui.panel} aria-labelledby="faq-title">
-        <div className={ui.panelHeader}><h2 id="faq-title">{t('Frequently asked questions', 'Часті питання')}</h2></div>
-        <div className={`${ui.segmented} ${styles.topics}`} role="group" aria-label={t('Topics', 'Теми')}>
-          {topics.map(item => <button key={item.id} type="button" className={ui.segment} aria-pressed={topic === item.id} onClick={() => setTopic(item.id)}>{item.label}</button>)}
+      <section className={styles.faqPanel} aria-labelledby="faq-title">
+        <h2 id="faq-title" className={styles.panelTitle}>{t('Frequently asked questions', 'Часті питання')}</h2>
+        <div className={styles.topics} role="group" aria-label={t('Topics', 'Теми')}>
+          {topics.map(item => <button key={item.id} type="button" className={styles.topic} aria-pressed={topic === item.id} onClick={() => setTopic(item.id)}>{item.label}</button>)}
         </div>
         {entries.length ? <FaqAccordion key={`${topic}:${needle}`} entries={entries} t={t}/>
           : <EmptyState icon={<Icon name="search"/>} title={t('Nothing found', 'Нічого не знайдено')}>{t('Try another word or choose a different topic.', 'Спробуй інше слово або обери іншу тему.')}</EmptyState>}
       </section>
       <div className={styles.side}>
-        <section className={`${ui.panel} ${styles.contact}`}>
-          <div className={ui.panelHeader}><h2>{t('Let’s talk', 'Поговорімо')}</h2></div>
-          <p>{t('Live chat and call-backs are on the way.', 'Онлайн-чат і зворотний дзвінок незабаром.')}</p>
-          <button type="button" className={ui.button} disabled><Icon name="help" size={18}/>{t('Start a live chat', 'Почати онлайн-чат')}<SoonBadge/></button>
-          <button type="button" className={ui.button} disabled><Icon name="phone" size={18}/>{t('Request a call', 'Замовити дзвінок')}<SoonBadge/></button>
+        <section className={styles.contact}>
+          <h2 className={styles.panelTitle}>{t('Let’s talk', 'Поговорімо')}</h2>
+          <p className={styles.subtitle}>{t('Our team is here for you.', 'Наша команда поруч.')}</p>
+          <button type="button" className={`${ui.button} ${styles.contactButton}`} disabled><Icon name="help" size={18}/>{t('Start a live chat', 'Почати онлайн-чат')}</button>
+          <p className={styles.hint}>{t('Live chat and call-backs are coming soon', 'Онлайн-чат і дзвінки — незабаром')}</p>
+          <button type="button" className={`${ui.button} ${styles.contactButton}`} disabled>{t('Request a call', 'Замовити дзвінок')}</button>
         </section>
-        <section className={ui.panel}>
-          <div className={ui.panelHeader}><h2>{t('Your requests', 'Твої звернення')}</h2><SoonBadge/></div>
-          <EmptyState icon={<Icon name="statement"/>} title={t('No requests yet', 'Звернень поки немає')}>{t('Your conversations with our team will appear here.', 'Тут з’являться твої звернення до команди.')}</EmptyState>
+        <section className={styles.requests}>
+          <div className={styles.requestsHead}><h2 className={styles.panelTitle}>{t('Your requests', 'Твої звернення')}</h2><SoonBadge/></div>
+          <strong className={styles.requestTitle}>{t('No requests yet', 'Звернень поки немає')}</strong>
+          <small className={styles.requestMeta}>{t('Your conversations with our team will appear here.', 'Тут з’являться твої звернення до команди.')}</small>
+          <hr className={styles.divider}/>
+          <span className={styles.requestLink}>{t('View conversation', 'Переглянути розмову')}<Icon name="arrow" size={18}/></span>
         </section>
       </div>
     </div>
