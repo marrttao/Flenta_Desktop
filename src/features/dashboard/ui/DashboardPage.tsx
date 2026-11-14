@@ -1,87 +1,138 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useDashboard, type DashboardModel, type Transaction } from '../model/useDashboard'
-import { bankingError, parseAmount } from '../../banking/utils/banking.js'
+import { parseAmount } from '../../banking/utils/banking.js'
+import { transactionLabel, transactionStatus } from '../../banking/utils/transactionLabel'
+import type { IconName } from '../../workspace/ui/Icon'
 import { DashboardLayout, Dialog, Feedback, Icon } from './DashboardLayout'
-import { CardsPanel } from './CardsPanel'
-import { SavingsPanel } from './SavingsPanel'
 import styles from './Dashboard.module.css'
 
-function transactionLabel(transaction: Transaction, m: DashboardModel) {
-  const labels: Record<string, string> = {
-    TopUp: m.text('Top up', 'Поповнення'), InternalTransfer: m.text('Internal transfer', 'Між рахунками'),
-    IbanTransfer: m.text('IBAN transfer', 'Переказ за IBAN'), Purchase: m.text('Card payment', 'Оплата карткою'),
-    SavingsDeposit: m.text('Savings deposit', 'Поповнення цілі'), SavingsWithdrawal: m.text('Savings withdrawal', 'Повернення з цілі'),
-    Exchange: m.text('Currency exchange', 'Обмін валют'),
-  }
-  return labels[transaction.kind] || transaction.kind
-}
-
-function exportPage(m: DashboardModel) {
+function exportTransactions(m: DashboardModel) {
   const cell = (value: string | number) => {
     const safe = typeof value === 'string' && /^[=+\-@\t\r]/.test(value) ? `'${value}` : String(value)
     return `"${safe.replace(/"/g, '""')}"`
   }
   const rows = [['Date', 'Operation', 'Amount', 'Currency', 'Fee', 'Status'], ...m.transactions.map(t => [t.createdAt, t.kind, t.amount, t.currency, t.fee, t.status])]
-  const url = URL.createObjectURL(new Blob(['\uFEFF' + rows.map(r => r.map(cell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' }))
+  const url = URL.createObjectURL(new Blob(['﻿' + rows.map(r => r.map(cell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' }))
   const link = document.createElement('a')
-  link.href = url; link.download = `flenta-transactions-page-${m.offset / 20 + 1}.csv`; link.click()
+  link.href = url; link.download = 'flenta-transactions.csv'; link.click()
   window.setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
-function History({ model: m }: { model: DashboardModel }) {
-  const t = m.text
-  const [search, setSearch] = useState('')
-  const transactions = m.transactions.filter(row => `${row.kind} ${transactionLabel(row, m)} ${row.status} ${row.currency} ${row.destinationIban || ''} ${row.destinationAccountId || ''}`.toLowerCase().includes(search.toLowerCase().trim()))
-  const status = (value: string) => ({ Completed: t('Completed', 'Виконано'), Rejected: t('Declined', 'Відхилено'), Pending: t('Pending', 'В обробці') }[value] || value)
-  return <section id="dashboard-history" className={styles.history}>
-    <div className={styles.sectionHeading}><h2>{t('Recent transactions', 'Останні операції')}</h2><button className={styles.textButton} type="button" disabled={!m.transactions.length} onClick={() => exportPage(m)}><Icon name="statement"/><span>CSV</span></button></div>
-    <label className={styles.historySearch}><Icon name="search"/><input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder={t('Filter this page', 'Пошук на цій сторінці')} aria-label={t('Filter transactions on this page', 'Пошук операцій на цій сторінці')}/></label>
-    {transactions.length ? <div className={styles.tableScroll}><table><thead><tr><th>{t('Date', 'Дата')}</th><th>{t('Operation', 'Операція')}</th><th>{t('Amount / fee', 'Сума / комісія')}</th><th>{t('Status', 'Статус')}</th></tr></thead><tbody>{transactions.map(row => <tr key={row.id}>
-      <td>{new Date(row.createdAt).toLocaleDateString(m.locale, { day: '2-digit', month: 'short', year: 'numeric' })}</td>
-      <td><strong>{transactionLabel(row, m)}</strong><small>{row.destinationIban || (row.destinationAccountId ? `…${row.destinationAccountId.slice(-6)}` : 'Flenta')}{row.failureCode && ` · ${bankingError({ code: row.failureCode, message: t('Operation declined', 'Операцію відхилено') })}`}</small></td>
-      <td className={styles.amount}>{m.format(row.amount, row.currency)}<small>{t('Fee', 'Комісія')}: {m.format(row.fee, row.currency)}</small></td>
-      <td><span className={`${styles.chip} ${row.status === 'Completed' ? styles.completed : row.status === 'Rejected' ? styles.rejected : styles.pending}`}>{status(row.status)}</span></td>
-    </tr>)}</tbody></table></div> : <div className={styles.empty}><span className={styles.emptyIcon}><Icon name="statement"/></span><h3>{search ? t('No matching transactions', 'Операцій не знайдено') : t('A fresh start', 'Новий початок')}</h3><p>{search ? t('Try a different search on this page.', 'Спробуй інший пошук на цій сторінці.') : t('Your top-ups, transfers and purchases will appear here.', 'Тут з’являться твої поповнення, перекази та покупки.')}</p></div>}
-    <div className={styles.pagination}><button type="button" className={styles.textButton} disabled={m.disabled || m.offset === 0} onClick={() => { setSearch(''); m.setOffset(Math.max(0, m.offset - 20)) }}>← {t('Newer', 'Новіші')}</button><span>{t('Page', 'Сторінка')} {m.offset / 20 + 1}</span><button type="button" className={styles.textButton} disabled={m.disabled || m.transactions.length < 20 || m.offset >= 10000} onClick={() => { setSearch(''); m.setOffset(m.offset + 20) }}>{t('Older', 'Старіші')} →</button></div>
+function BalanceCard({ model: m }: { model: DashboardModel }) {
+  const account = m.activeAccount
+  const card = m.activeCard
+  return <section className={styles.card} aria-label={m.text('Current account', 'Поточний рахунок')}>
+    <span className={styles.cardBrand}>Flenta</span>
+    <span className={styles.cardBalance}>{m.user && m.loaded && account ? m.format(account.balance, account.currency) : '—'}</span>
+    {card && <span className={styles.cardExpiry}>{String(card.expiryMonth).padStart(2, '0')}/{String(card.expiryYear).slice(-2)}</span>}
+    <Link to="/cards" className={styles.otherCards}>{m.text('Other cards', 'Інші картки')}<Icon name="grid" size={26}/></Link>
   </section>
 }
 
-function Spending({ model: m }: { model: DashboardModel }) {
+function SpendingWidget({ model: m }: { model: DashboardModel }) {
   const t = m.text
   const spending = m.analytics?.currencies.find(c => c.currency === m.activeAccount?.currency)
+  const hasData = Boolean(spending && spending.purchases > 0)
   return <section className={styles.spending}>
-    <header><span className={styles.goalIcon}><Icon name="wallet"/></span><div><h2>{t('Monthly spending', 'Витрати за місяць')}</h2><small>{new Date().toLocaleDateString(m.locale, { month: 'long', year: 'numeric' })}</small></div><span className={styles.chip}>{m.activeAccount?.currency || 'UAH'}</span></header>
-    {m.analyticsError ? <p className={styles.error} role="alert">{m.analyticsError}</p> : spending && spending.purchases > 0 ? <div className={styles.spendingValue}><strong>{m.format(spending.expenses, spending.currency)}</strong><span>{spending.purchases} {t('purchases this month', 'покупок цього місяця')}</span></div> : <div className={styles.spendingEmpty}><span className={styles.emptyIcon}><Icon name="card"/></span><strong>{t('No spending data available', 'Даних про витрати поки немає')}</strong><small>{t('Your monthly spending summary will appear once transactions are processed.', 'Огляд витрат з’явиться після обробки операцій.')}</small></div>}
-    <footer><small>{t('A little clarity for your money.', 'Більше ясності у твоїх фінансах.')}</small><a href="#dashboard-history">{t('View transactions', 'До операцій')} <Icon name="arrow"/></a></footer>
+    <header className={styles.widgetHeader}>
+      <div className={styles.widgetTitle}><span className={styles.widgetIcon}><Icon name="coins" size={18}/></span>
+        <div><h2>{t('Monthly Spending', 'Витрати за місяць')}</h2><small>{new Date().toLocaleDateString(m.locale, { month: 'long', year: 'numeric' })}</small></div></div>
+      <span className={styles.pill}>{hasData && spending ? spending.currency : t('No Data', 'Немає даних')}</span>
+    </header>
+    <div className={styles.widgetBody}>
+      {m.analyticsError ? <p role="alert">{m.analyticsError}</p> : hasData && spending ? <>
+        <span className={styles.spendingValue}>{m.format(spending.expenses, spending.currency)}</span>
+        <p>{spending.purchases} {t('purchases this month', 'покупок цього місяця')}</p>
+      </> : <>
+        <span className={styles.illustration}><Icon name="card" size={18}/></span>
+        <div><strong>{t('No spending data available', 'Даних про витрати поки немає')}</strong>
+          <p>{t('Your monthly spending summary will appear here once transactions are processed.', 'Огляд витрат за місяць з’явиться тут після обробки операцій.')}</p></div>
+      </>}
+    </div>
+    <footer className={styles.widgetFooter}>
+      <span>{t('Check back later for your summary.', 'Зазирни пізніше, щоб побачити підсумок.')}</span>
+      <a className={styles.widgetLink} href="#recent-transactions">{t('View Transactions', 'До операцій')}<Icon name="arrow" size={18}/></a>
+    </footer>
   </section>
+}
+
+function counterparty(row: Transaction, m: DashboardModel) {
+  if (row.destinationIban) return `IBAN ···· ${row.destinationIban.slice(-4)}`
+  if (row.destinationAccountId && m.accounts.some(a => a.id === row.destinationAccountId) && row.kind !== 'TopUp') return m.text('My account', 'Мій рахунок')
+  return 'Flenta'
+}
+
+const tableAmount = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 })
+
+const statusClass: Record<string, string> = { Completed: styles.statusCompleted, Pending: styles.statusPending, Rejected: styles.statusRejected }
+
+function RecentTransactions({ model: m }: { model: DashboardModel }) {
+  const t = m.text
+  const locale = m.locale
+  const rows = m.transactions.slice(0, 10)
+  const currency = m.activeAccount?.currency || rows[0]?.currency || 'UAH'
+  return <section id="recent-transactions">
+    <h2 className={styles.sectionTitle}>{t('Recent transactions:', 'Останні операції:')}</h2>
+    <table className={styles.table}>
+      <colgroup><col style={{ width: '20.9%' }}/><col style={{ width: '21.5%' }}/><col style={{ width: '21.5%' }}/><col style={{ width: '17.2%' }}/><col style={{ width: '18.9%' }}/></colgroup>
+      <thead><tr><th>{t('Date', 'Дата')}</th><th>{t('Recipient', 'Одержувач')}</th><th>{t('Category', 'Категорія')}</th><th>{t('Amount', 'Сума')} ({currency})</th><th>{t('Status', 'Статус')}</th></tr></thead>
+      <tbody>{rows.length ? rows.map(row => <tr key={row.id}>
+        <td className={styles.date}>{new Date(row.createdAt).toLocaleDateString(locale, { month: 'short', day: '2-digit', year: 'numeric' })}</td>
+        <td>{counterparty(row, m)}</td>
+        <td>{transactionLabel(row.kind, t)}</td>
+        <td>{tableAmount.format(row.amount)}{row.currency !== currency && ` ${row.currency}`}</td>
+        <td><span className={`${styles.status} ${statusClass[row.status] || styles.statusOther}`}>{transactionStatus(row.status, t)}</span></td>
+      </tr>) : <tr className={styles.emptyRow}><td colSpan={5}>{m.loading ? t('Loading transactions…', 'Завантажуємо операції…') : t('Your top-ups, transfers and purchases will appear here.', 'Тут з’являться твої поповнення, перекази та покупки.')}</td></tr>}</tbody>
+    </table>
+  </section>
+}
+
+interface QuickAction { icon: IconName; title: string; description: string; onClick?: () => void; disabled?: boolean; soon?: boolean }
+
+function QuickActions({ model: m }: { model: DashboardModel }) {
+  const t = m.text
+  const navigate = useNavigate()
+  const actions: QuickAction[] = [
+    { icon: 'coins', title: t('Top up', 'Поповнення'), description: t('Add funds to your account', 'Додай кошти на рахунок'), onClick: () => m.setAction('topup'), disabled: m.disabled },
+    { icon: 'transfer', title: t('Transfer', 'Переказ'), description: t('Send money to contacts', 'Надсилай кошти іншим'), onClick: () => navigate('/transfers') },
+    { icon: 'help', title: t('Statement', 'Виписка'), description: t('Download your transactions as CSV', 'Завантаж операції у CSV'), onClick: () => exportTransactions(m), disabled: !m.transactions.length },
+    { icon: 'phonePlus', title: t('Mobile top-up', 'Поповнення мобільного'), description: t('Recharge your phone plan', 'Поповни рахунок телефону'), soon: true },
+    { icon: 'cardRefresh', title: t('Loan repayment', 'Погашення кредиту'), description: t('Manage upcoming payments', 'Керуй майбутніми платежами'), soon: true },
+    { icon: 'savings', title: t('Piggy bank', 'Скарбничка'), description: t('Save for your goals', 'Відкладай на свої цілі'), soon: true },
+  ]
+  return <section>
+    <h2 className={styles.sectionTitle}>{t('Quick actions', 'Швидкі дії')}</h2>
+    <div className={styles.actions}>
+      {actions.map(action => <button key={action.icon} type="button" className={styles.action} disabled={action.disabled || action.soon} onClick={action.onClick}>
+        <span className={styles.actionIcon}><Icon name={action.icon} size={18}/></span>
+        <span className={styles.actionText}><strong>{action.title}{action.soon && <span>{t('Soon', 'Незабаром')}</span>}</strong><small>{action.description}</small></span>
+        <Icon name="arrow" size={18}/>
+      </button>)}
+    </div>
+  </section>
+}
+
+function TopUpDialog({ model: m }: { model: DashboardModel }) {
+  const t = m.text
+  const account = m.activeAccount
+  return <Dialog title={t('Top up your account', 'Поповнити рахунок')} onClose={() => { if (!m.busy) m.setAction(null) }}>
+    <p className={styles.muted}>{t('Virtual funds for testing Flenta.', 'Віртуальні кошти для тестування Flenta.')}</p><Feedback model={m}/>
+    {account ? <form onSubmit={async e => {
+      e.preventDefault(); const data = new FormData(e.currentTarget)
+      if (await m.run(() => m.operation(`/api/accounts/${data.get('accountId')}/top-ups`, { amount: parseAmount(data.get('amount')) }), t('Virtual top-up completed.', 'Тестове поповнення виконано.'))) m.setAction(null)
+    }}><fieldset disabled={m.disabled}>
+      <label>{t('Account', 'Рахунок')}<select name="accountId" defaultValue={account.id} required>{m.accounts.map(a => <option key={a.id} value={a.id}>{a.currency} · …{a.iban.slice(-6)}</option>)}</select></label>
+      <label>{t('Amount in the selected account currency', 'Сума у валюті обраного рахунку')}<input name="amount" inputMode="decimal" required defaultValue="1000"/></label>
+      <button className={styles.primary} type="submit">{m.busy ? t('Processing…', 'Обробка…') : t('Top up', 'Поповнити')}</button>
+    </fieldset></form> : <p>{t('You do not have an account yet.', 'У тебе ще немає рахунку.')} <Link to="/cards">{t('Open one on the Cards page.', 'Відкрий його на сторінці «Картки».')}</Link></p>}
+  </Dialog>
 }
 
 export function DashboardPage() {
   const m = useDashboard()
-  const t = m.text
-  const navigate = useNavigate()
-  const quickActions = [
-    { icon: 'wallet' as const, title: t('Top up', 'Поповнення'), description: t('Add virtual funds to your account', 'Додай віртуальні кошти на рахунок'), action: () => m.setAction('topup'), disabled: m.disabled },
-    { icon: 'transfer' as const, title: t('Transfer', 'Переказ'), description: t('Send money between accounts', 'Переказуй між рахунками'), action: () => navigate('/transfers'), disabled: false },
-    { icon: 'statement' as const, title: t('Statement', 'Виписка'), description: t('Export this transaction page as CSV', 'Експортуй цю сторінку операцій у CSV'), action: () => exportPage(m), disabled: !m.transactions.length },
-    { icon: 'purchase' as const, title: t('Card payment', 'Оплата карткою'), description: t('Try a virtual purchase and round-ups', 'Спробуй тестову покупку та округлення'), action: () => m.setAction('purchase'), disabled: m.disabled || !m.cards.some(c => c.status === 'Active') },
-    { icon: 'plus' as const, title: t('New account', 'Новий рахунок'), description: t('Keep UAH, USD and EUR separately', 'Тримай UAH, USD та EUR окремо'), action: () => m.setAction('accounts'), disabled: m.disabled },
-  ]
   return <DashboardLayout model={m}>
-    <div className={styles.overview}><CardsPanel model={m}/><Spending model={m}/></div>
-    <div className={styles.detailsGrid}><History model={m}/><section className={styles.quickActions}><h2>{t('Quick actions', 'Швидкі дії')}</h2><div className={styles.actionList}>
-      {quickActions.map(action => <button key={action.icon} type="button" disabled={action.disabled} onClick={action.action}><span className={styles.actionIcon}><Icon name={action.icon}/></span><span><strong>{action.title}</strong><small>{action.description}</small></span><Icon name="arrow"/></button>)}
-      <a href="#dashboard-savings"><span className={styles.actionIcon}><Icon name="savings"/></span><span><strong>{t('Piggy bank', 'Накопичення')}</strong><small>{t('Save for your goals', 'Відкладай на свої цілі')}</small></span><Icon name="arrow"/></a>
-    </div></section></div>
-    <SavingsPanel model={m}/>
-    {m.action === 'purchase' && <Dialog title={t('Try a virtual purchase', 'Спробувати тестову покупку')} onClose={() => { if (!m.busy) m.setAction(null) }}>
-      <p className={styles.muted}>{t('This sandbox payment can trigger cashback and the savings rules you configured. Savings contributions are charged in addition to the purchase.', 'Ця тестова покупка може нарахувати кешбек і застосувати твої правила накопичення. Відрахування списується додатково до покупки.')}</p><Feedback model={m}/>
-      <form onSubmit={async e => {
-        e.preventDefault(); const data = new FormData(e.currentTarget)
-        if (await m.run(() => m.operation('/api/finance/purchases', { cardId: data.get('cardId'), amount: parseAmount(data.get('amount')) }), t('Virtual purchase completed.', 'Тестову покупку оплачено.'))) m.setAction(null)
-      }}><fieldset disabled={m.disabled}><label>{t('Card', 'Картка')}<select name="cardId" defaultValue={m.activeCard?.status === 'Active' ? m.activeCard.id : undefined} required>{m.cards.filter(c => c.status === 'Active').map(c => <option key={c.id} value={c.id}>{c.maskedNumber} · {m.accounts.find(a => a.id === c.accountId)?.currency}</option>)}</select></label>
-        <label>{t('Amount in the card account currency', 'Сума у валюті рахунку картки')}<input name="amount" inputMode="decimal" required/></label><button className={styles.primary} type="submit">{t('Pay with virtual funds', 'Оплатити віртуальними коштами')}</button></fieldset></form>
-    </Dialog>}
+    <div className={styles.row}><BalanceCard model={m}/><SpendingWidget model={m}/></div>
+    <div className={`${styles.row} ${styles.lower}`}><RecentTransactions model={m}/><QuickActions model={m}/></div>
+    {m.action === 'topup' && <TopUpDialog model={m}/>}
   </DashboardLayout>
 }

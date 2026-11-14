@@ -1,125 +1,67 @@
-/* Dashboard content inside the shared desktop workspace shell (see features/workspace). */
-.dashboard { --surface: #20202c; --line: #3d3b4d; --muted: #b9b5c9; --accent: #a99aff; color: #f4f2fa; font-size: 13px; }
-.dashboard button:disabled { opacity: .4; cursor: not-allowed; }
-.sandbox { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 18px; color: var(--muted); font-size: 11px; }
-.dashboard h1, .dashboard h2, .dashboard h3 { color: #f4f2fa; font-family: inherit; }
-.dashboard h2 { margin: 0; font-size: clamp(20px, 1.66vw, 30px); font-weight: 500; letter-spacing: -.025em; }
-.dashboard h3 { font-size: 17px; font-weight: 500; }
-.dashboard a { color: inherit; }
-.dashboard button, .dashboard input, .dashboard select { font-family: inherit; }
-.dashboard button { cursor: pointer; }
-.iconButton { border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: inherit; border: 0; width: 36px; height: 36px; padding: 6px; flex-shrink: 0; }
-.loading { font-size: 12px; color: #a99aff; }
-.overview, .detailsGrid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: clamp(20px, 1.7vw, 32px); align-items: start; }
-.detailsGrid { margin-top: 30px; }
-.cardSection { min-width: 0; }
-.bankCard { min-height: clamp(220px, 18.9vw, 363px); padding: clamp(22px, 1.67vw, 32px); color: #fff; border-radius: 22px; background: linear-gradient(96deg, #5033f2 0%, #514fb4 52%, #91edce 100%); display: flex; flex-direction: column; }
-.cardTop { display: flex; justify-content: space-between; align-items: center; font-size: clamp(25px, 2.4vw, 46px); line-height: 1.1; letter-spacing: -.02em; }
-.cardBadge { border: 1px solid #ffffff55; padding: 5px 10px; border-radius: 20px; font-size: 12px; letter-spacing: 0; }
-.balance { margin-top: clamp(24px, 2vw, 38px); font-size: clamp(30px, 3.3vw, 64px); line-height: 1.2; letter-spacing: -.04em; overflow-wrap: anywhere; }
-.cardNumber { margin-top: 12px; font-size: 13px; letter-spacing: .05em; opacity: .85; }
-.cardBottom { margin-top: auto; padding-top: 30px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
-.cardBottom :is(a, button) { display: flex; gap: 9px; align-items: center; background: transparent; border: 0; color: #252843; font-size: 13px; padding: 5px 0 5px 10px; }
-.accountStrip { display: flex; gap: 8px; margin-top: 12px; }
-.accountStrip select { width: 100%; min-width: 0; background: #292938; border: 1px solid #494859; color: #d8d6e8; padding: 9px 12px; font-size: 11px; }
-.textButton { display: inline-flex; align-items: center; justify-content: center; gap: 7px; background: transparent; color: #a99aff; border: 0; font-size: 12px; padding: 8px 4px; white-space: nowrap; }
-.spending { border: 1px solid #3d3b4d; border-radius: 22px; padding: 22px; min-height: clamp(220px, 18.9vw, 363px); display: flex; flex-direction: column; }
-.spending > header { display: flex; gap: 10px; align-items: center; }
-.spending h2 { font-size: 15px; letter-spacing: 0; }
-.spending header small { font-size: 10px; color: var(--muted); }
-.spending header > .chip { margin-left: auto; font-size: 9px; }
-.goalIcon, .emptyIcon { display: inline-grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 12px; background: #332c54; color: #b09cff; }
-.spending .goalIcon { width: 30px; height: 30px; border-radius: 8px; }
-.spendingEmpty { display: flex; align-items: center; flex-direction: column; text-align: center; max-width: 260px; margin: auto; padding: 20px 0; gap: 8px; }
-.spendingEmpty strong { font-size: 12px; font-weight: 400; }
-.spendingEmpty small { color: var(--muted); font-size: 11px; line-height: 1.45; }
-.spendingValue { margin: auto 0; display: flex; flex-direction: column; text-align: center; gap: 10px; padding: 32px 0; }
-.spendingValue strong { font-size: clamp(24px, 2.1vw, 40px); font-weight: 400; overflow-wrap: anywhere; }
-.spendingValue span { color: var(--muted); font-size: 12px; }
-.spending footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 10px; }
-.spending footer small { color: var(--muted); font-size: 9px; }
-.spending footer a { display: inline-flex; align-items: center; gap: 3px; color: #a99aff; }
-.spending footer svg { width: 14px; height: 14px; }
-.sectionHeading { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 20px; }
-.sectionHeading h2 { display: flex; gap: 10px; align-items: center; }
-.sectionHeading p { color: var(--muted); font-size: 12px; margin: 7px 0 0; }
-.history, .quickActions { min-width: 0; scroll-margin-top: 24px; }
-.historySearch { display: flex; gap: 8px; align-items: center; color: var(--muted); border-bottom: 1px solid #3d3b4d; margin: 0 0 14px; }
-.historySearch svg { width: 15px; height: 15px; }
-.historySearch input { width: 100%; border: 0; background: transparent; padding: 10px 4px; color: #e3e0f0; font-size: 11px; }
-.tableScroll { overflow: auto; max-height: 480px; }
-.history th { position: sticky; top: 0; background: #15151e; z-index: 1; }
-.history table { border-collapse: collapse; width: 100%; text-align: left; font-size: 11px; }
-.history th { color: #d7d4e5; font-size: 10px; font-weight: 400; }
-.history th, .history td { padding: 13px 8px; border-bottom: 1px solid #3d3b4d; }
-.history td:first-child { white-space: nowrap; }
-.history td strong { font-weight: 400; }
-.history td small { display: block; color: var(--muted); font-size: 9px; margin-top: 4px; overflow-wrap: anywhere; }
-.amount { white-space: nowrap; }
-.chip { display: inline-block; background: #39334f; color: #cabdff; border-radius: 20px; padding: 4px 9px; font-size: 10px; line-height: 1.2; white-space: nowrap; }
-.completed { background: #c7f3de; color: #254a3a; }
-.rejected { background: #f4c8cd; color: #67323a; }
-.pending { background: #f2e6b8; color: #645221; }
-.pagination { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; font-size: 11px; color: var(--muted); }
-.quickActions > h2 { margin: 0 0 20px; }
-.actionList { display: grid; gap: 12px; border-radius: 22px; background: #20202c; padding: clamp(16px, 1.4vw, 28px); }
-.actionList > :is(button, a) { display: flex; gap: 12px; align-items: center; padding: 12px; background: #15151e; border: 1px solid #3d3b4d; border-radius: 13px; color: #eae8f4; text-align: left; font-size: 12px; min-width: 0; }
-.actionList > :is(button, a):not(:disabled):hover { background: #39334d; text-decoration: none; }
-.actionList strong { font-weight: 400; display: block; }
-.actionList small { display: block; font-size: 10px; color: var(--muted); margin-top: 3px; line-height: 1.3; }
-.actionList > :is(button, a) > svg { margin-left: auto; width: 14px; height: 14px; flex-shrink: 0; }
-.actionIcon { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 9px; background: #555167; flex-shrink: 0; }
-.empty { min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 28px 20px; border: 1px dashed #4f4b65; border-radius: 18px; }
-.empty h3 { margin: 15px 0 8px; }
-.empty p { color: var(--muted); font-size: 12px; max-width: 260px; margin: 0; }
-.savings { margin-top: 40px; padding-top: 30px; border-top: 1px solid #474354; scroll-margin-top: 24px; }
-.goalsGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
-.goalCard { display: flex; flex-direction: column; gap: 18px; padding: 22px; min-width: 0; text-align: left; background: #20202c; color: #f1eef9; border: 1px solid #514b67; border-radius: 20px; }
-.goalCard:hover { border-color: #9984ff; }
-.goalCard > strong { font-weight: 500; font-size: 17px; overflow-wrap: anywhere; }
-.goalHeader { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.goalBalance { display: block; font-size: 20px; margin: 0; overflow-wrap: anywhere; }
-.goalBalance small { display: block; color: #bab3ce; font-size: 12px; margin-top: 4px; }
-.goalCard progress { width: 100%; height: 7px; border: 0; border-radius: 6px; overflow: hidden; accent-color: #9b84ff; background: #494256; }
-.goalCard progress::-webkit-progress-bar { background: #494256; border-radius: 6px; }
-.goalCard progress::-webkit-progress-value { background: linear-gradient(90deg, #7660ff, #b6a0fb); border-radius: 6px; }
-.goalFooter { display: flex; justify-content: space-between; gap: 12px; font-size: 10px; color: #bdb3dc; }
-.savingsEmpty { display: flex; align-items: center; gap: 22px; padding: 26px; border: 1px solid #4f4863; border-radius: 18px; background: #2b293b; }
-.savingsEmpty h3 { margin: 0 0 8px; }
-.savingsEmpty p { color: var(--muted); font-size: 12px; margin: 0; }
-.archived { margin-top: 22px; color: var(--muted); font-size: 12px; }
-.archived summary { cursor: pointer; margin-bottom: 10px; }
-.notice, .error { padding: 14px 16px; border: 1px solid #5a4c82; background: #342e4b; color: #e3daff; border-radius: 12px; font-size: 13px; margin: 0 0 18px; overflow-wrap: anywhere; }
-.notice a { color: #cabaff; text-decoration: underline; }
-.error { border-color: #975b6d; background: #4a2935; color: #ffd6de; }
-.muted { color: #bfb4d1; font-size: 12px; line-height: 1.6; }
-.primary, .secondary, .danger { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid transparent; border-radius: 11px; min-height: 44px; padding: 12px 18px; font-size: 13px; color: #fff; background: #6442ff; cursor: pointer; }
-.primary:hover:not(:disabled) { background: #7855ff; }
-.secondary { border-color: #746582; background: #373044; color: #f1e9ff; }
-.secondary:hover:not(:disabled) { background: #49405b; }
-.danger { background: #9b3457; }
-.itemList { display: grid; gap: 14px; }
-.accountItem, .cardChoice { display: flex; align-items: center; gap: 14px; min-width: 0; width: 100%; padding: 14px; border: 1px solid #665477; border-radius: 13px; background: #332b43; color: #f4ebff; text-align: left; font-size: 13px; }
-.accountItem > span:nth-child(2) { min-width: 0; }
-.accountItem small, .cardChoice small { display: block; color: #bcafcf; font-size: 10px; margin-top: 5px; overflow-wrap: anywhere; }
-.accountItem > strong { margin-left: auto; font-size: 12px; }
-.currencyIcon, .miniCard { display: grid; place-items: center; width: 40px; height: 34px; border-radius: 9px; background: linear-gradient(100deg, #6044f4, #80c8bd); color: #fff; font-size: 20px; flex-shrink: 0; }
-.cardItem { background: #30283f; border-radius: 14px; }
-.cardChoice { border: 0; background: transparent; }
-.cardChoice[aria-pressed='true'] { box-shadow: inset 0 0 0 1px #aa8cf6; }
-.cardChoice > svg { margin-left: auto; }
-.inlineActions { display: flex; flex-wrap: wrap; gap: 12px; margin: 12px 0; }
-.cardItem .inlineActions { padding: 0 14px 14px; }
-.inlineActions > button { font-size: 12px; color: #ddccfa; background: #42364f; border: 1px solid #70607f; border-radius: 8px; padding: 8px 12px; }
-.quote { border-top: 1px solid #645274; margin-top: 26px; padding-top: 8px; }
-.quote dl, .requisites { display: grid; grid-template-columns: 1fr auto; gap: 14px; margin: 22px 0; font-size: 14px; }
-.quote dd, .requisites dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
-.requisites { grid-template-columns: 1fr; }
-.requisites dd { text-align: left; margin: -8px 0 10px; font-size: 20px; }
-.quote > button { width: 100%; }
-.goalMovement { border-top: 1px solid #5a4b6b; padding-top: 8px; margin-top: 30px !important; }
+/* Home (Figma: app Desktop › Laptop · Dashboard, 1440×1024). Column widths 652 / 460 with a 24px gutter. */
+.home { color: #f4f2fa; }
+.row { display: grid; grid-template-columns: minmax(0, 652fr) minmax(0, 460fr); gap: 24px; }
+.lower { margin-top: 38px; align-items: start; }
+.home h2.sectionTitle { margin: 0; font-size: 24px; font-weight: 700; line-height: 33px; }
+.error { margin: 0 0 16px; padding: 12px 16px; border: 1px solid #975b6d; border-radius: 12px; background: #4a2935; color: #ffd6de; font-size: 13px; overflow-wrap: anywhere; }
+.notice { margin: 0 0 16px; padding: 12px 16px; border: 1px solid #5a4c82; border-radius: 12px; background: #2a2545; color: #e3daff; font-size: 13px; }
+
+/* Balance card */
+.card { position: relative; height: 272px; padding: 18px 24px; border-radius: 16px; background: linear-gradient(90deg, #5146e5 0%, #4d55b8 50%, #86e3c0 100%); color: #f4f2fa; overflow: hidden; }
+.cardBrand { display: block; font-size: 36px; font-weight: 600; line-height: 49px; }
+.cardBalance { display: block; margin-top: 19px; font-size: 48px; font-weight: 500; line-height: 66px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cardExpiry { position: absolute; left: 24px; top: 206px; font-size: 15px; font-weight: 600; line-height: 20px; }
+.otherCards { position: absolute; right: 22px; top: 222px; display: flex; align-items: center; gap: 30px; color: #f4f2fa; font-size: 14px; font-weight: 600; line-height: 19px; }
+
+/* Monthly spending widget */
+.spending { display: flex; flex-direction: column; gap: 15px; height: 272px; padding: 18px; border: .75px solid #3d3b4d; border-radius: 16px; background: #20202c; }
+.widgetHeader { display: flex; align-items: center; justify-content: space-between; height: 36px; }
+.widgetTitle { display: flex; align-items: center; gap: 9px; }
+.widgetIcon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: #332c54; }
+.home .widgetTitle h2 { margin: 0; font-size: 15px; font-weight: 700; line-height: 20px; }
+.widgetTitle small { display: block; margin-top: 1.5px; color: #b9b5c9; font-size: 10.5px; line-height: 14px; }
+.pill { padding: 4.5px 9px; border-radius: 75px; background: #332c54; color: #a99aff; font-size: 9px; font-weight: 600; line-height: 12px; }
+.widgetBody { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px; text-align: center; }
+.illustration { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 24px; background: #332c54; }
+.widgetBody strong { font-size: 12px; font-weight: 600; line-height: 16px; }
+.widgetBody p { max-width: 225px; margin: 3px 0 0; color: #b9b5c9; font-size: 10.5px; line-height: 14px; }
+.spendingValue { font-size: 32px; font-weight: 600; line-height: 1.2; }
+.widgetFooter { display: flex; align-items: center; justify-content: space-between; gap: 9px; height: 18px; color: #b9b5c9; font-size: 10.5px; }
+.widgetLink { display: inline-flex; align-items: center; gap: 3px; color: #a99aff; font-weight: 600; }
+
+/* Recent transactions */
+.table { width: 100%; margin-top: 27px; border-collapse: collapse; table-layout: fixed; background: #20202c; font-size: 12px; }
+.table th { height: 24px; padding: 0 18px; color: #f4f2fa; font-size: 10.5px; font-weight: 500; text-align: left; }
+.table td { height: 36px; padding: 0 18px; border-top: .75px solid #3d3b4d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.table tbody tr:last-child td { border-bottom: .75px solid #3d3b4d; }
+.table .date { padding-right: 33px; text-align: right; }
+.status { display: inline-block; padding: 3px 9px; border-radius: 18px; color: #111827; font-size: 9px; font-weight: 500; line-height: 12px; }
+.statusCompleted { background: #d1fae5; }
+.statusPending { background: #fef9c3; }
+.statusRejected { background: #fee2e2; }
+.statusOther { background: #f3e8ff; }
+.emptyRow td { height: 108px; color: #b9b5c9; text-align: center; white-space: normal; }
+
+/* Quick actions */
+.actions { display: grid; gap: 8.5px; margin-top: 19px; padding: 16px 16px 24px; border-radius: 16px; background: #20202c; }
+.action { display: flex; align-items: center; gap: 9px; height: 50px; padding: 9px; border: .75px solid #3d3b4d; border-radius: 12px; background: #20202c; color: #f4f2fa; text-align: left; font: inherit; cursor: pointer; }
+.action:hover:not(:disabled) { background: #282637; }
+.action:disabled { cursor: not-allowed; }
+.action:disabled .actionText { opacity: .55; }
+.actionIcon { display: grid; place-items: center; width: 30px; height: 30px; flex-shrink: 0; border-radius: 9px; background: #3d3b4d; }
+.actionText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1.5px; }
+.actionText strong { font-size: 12px; font-weight: 500; line-height: 16px; }
+.actionText small { color: #b9b5c9; font-size: 10.5px; line-height: 14px; }
+.actionText strong span { margin-left: 8px; padding: 1px 6px; border-radius: 10px; background: #332c54; color: #a99aff; font-size: 9px; font-weight: 600; }
+
+/* Dialog content */
+.muted { color: #b9b5c9; font-size: 12px; line-height: 1.6; }
+.primary { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 20px; border: 0; border-radius: 9px; background: #4f3cfb; color: #fff; font-size: 13px; font-weight: 600; }
+.primary:hover:not(:disabled) { background: #6352ff; }
+
+@media (max-width: 1100px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .lower > section + section { margin-top: 24px; grid-row: 1; }
+  .cardBalance { font-size: 40px; }
+}
 .srOnly { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-@media (max-width: 1100px) { .overview, .detailsGrid { grid-template-columns: minmax(0, 1fr); } .spending { min-height: 220px; } .spendingEmpty { padding: 12px 0; } .detailsGrid { margin-top: 28px; } .quickActions { grid-row: 1; } .actionList { grid-template-columns: repeat(2, minmax(0, 1fr)); } .goalsGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .balance { font-size: 44px; } .bankCard { min-height: 280px; } }
-@media (max-width: 760px) { .goalsGrid { grid-template-columns: minmax(0, 1fr); } .overview, .detailsGrid { gap: 24px; } .bankCard { min-height: 230px; padding: 24px; } .balance { font-size: 37px; } .cardTop { font-size: 28px; } .cardBottom { padding-top: 22px; } .sectionHeading { gap: 10px; } .sectionHeading h2 { font-size: 22px; } .sectionHeading > button { font-size: 11px; padding: 9px 12px; } }
-@media (max-width: 420px) { .actionList { grid-template-columns: minmax(0, 1fr); } .savingsEmpty { flex-direction: column; align-items: flex-start; gap: 16px; } .balance { font-size: 32px; } .history table { min-width: 440px; } .accountItem { flex-wrap: wrap; } .accountItem > strong { margin-left: 54px; } }
-@media (prefers-reduced-motion: reduce) { .dashboard * { scroll-behavior: auto; } }

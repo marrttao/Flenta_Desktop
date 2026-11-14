@@ -19,17 +19,17 @@ export interface Goal {
 }
 export interface Analytics { currencies: { currency: string; expenses: number; purchases: number }[] }
 export interface TransferQuote { amount: number; fee: number; total: number; currency: string; sufficientFunds: boolean }
-export type DashboardAction = 'topup' | 'accounts' | 'purchase' | null
+export type DashboardAction = 'topup' | null
+const moneyNumber = new Intl.NumberFormat('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const empty = { accounts: [] as Account[], cards: [] as Card[], transactions: [] as Transaction[] }
 
 export function useDashboard() {
   const { user, request, logout } = useAuth()
   const { language } = useTranslation()
   const text = useCallback((en: string, uk: string) => language === 'uk' ? uk : en, [language])
-  const locale = { en: 'en-GB', uk: 'uk-UA', pl: 'pl-PL', de: 'de-DE' }[language]
-  const format = useCallback((value: number, currency: string) => new Intl.NumberFormat(locale, {
-    style: 'currency', currency, maximumFractionDigits: 2,
-  }).format(value), [locale])
+  const locale = { en: 'en-US', uk: 'uk-UA', pl: 'pl-PL', de: 'de-DE' }[language]
+  // Figma money format: "40 543,20 UAH" (space-grouped, decimal comma, ISO code after the amount).
+  const format = useCallback((value: number, currency: string) => `${moneyNumber.format(value)} ${currency}`, [])
   const bank = useMemo(() => createBankingApi(request), [request])
   const operation = useMemo(() => createIdempotentRequest(request), [request])
   const [data, setData] = useState(empty)
