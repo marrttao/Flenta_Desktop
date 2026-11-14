@@ -44,7 +44,7 @@ export function SettingsPage() {
 
   if (!user) return null
   return <WorkspaceLayout section="settings" title={t('Settings', 'Налаштування')} subtitle={t('Make Flenta feel like you.', 'Зроби Flenta зручною для себе.')}
-    actions={<button type="submit" form={PROFILE_FORM_ID} className={ui.button} disabled={busy}>{busy ? t('Saving…', 'Зберігаємо…') : t('Save changes', 'Зберегти зміни')}</button>}>
+    actions={<button type="submit" form={PROFILE_FORM_ID} className={`${ui.button} ${styles.save}`} disabled={busy}>{busy ? t('Saving…', 'Зберігаємо…') : t('Save changes', 'Зберегти зміни')}</button>}>
     <Feedback error={error} notice={notice}/>
     <div className={styles.grid}>
       <PersonalInfoPanel user={user} text={text} busy={busy} onSave={name => void save(name)}/>
