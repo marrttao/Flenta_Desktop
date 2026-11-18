@@ -4,6 +4,7 @@ import { useTranslation } from '../../localization'
 import { createBankingApi, createIdempotentRequest } from '../../banking/api/bankingApi.js'
 import { bankingError } from '../../banking/utils/banking.js'
 import { financeApi } from '../../finance/api/financeApi.js'
+import { currentMonthRange } from './dateRange.js'
 
 export interface Account { id: string; iban: string; currency: string; balance: number }
 export interface Card { id: string; accountId: string; maskedNumber: string; status: string; expiryMonth: number; expiryYear: number }
@@ -58,9 +59,7 @@ export function useDashboard() {
     if (!user) return
     const current = ++generation.current
     setLoading(true)
-    const now = new Date()
-    const through = now.toISOString().slice(0, 10)
-    const from = `${through.slice(0, 7)}-01`
+    const { from, through } = currentMonthRange()
     const results = await Promise.allSettled([
       bank.snapshot(offset), financeApi.goals(request), financeApi.analytics(request, from, through),
     ])

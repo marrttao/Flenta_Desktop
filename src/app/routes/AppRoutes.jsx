@@ -37,7 +37,7 @@ function ApplicationRoutes() {
     '/auth/change-password': <ProtectedRoute><ChangePasswordPage /></ProtectedRoute>,
     '/profile': <ProtectedRoute><ProfilePage /></ProtectedRoute>,
     '/finance': <ProtectedRoute><FinancePage /></ProtectedRoute>,
-    '/kyc': <ProtectedRoute><ProfilePage /></ProtectedRoute>,
+    '/kyc': <ProtectedRoute><KycPage /></ProtectedRoute>,
   }
 
   const recovery = ['/auth/forgot-password', '/auth/reset-password', '/auth/confirm-email'].includes(path)
