@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../../auth/providers/authContext'
 import type { AuthUser } from '../../auth/types'
 import { getProfile, updateProfile } from '../../profile/api/profileApi.js'
-import { useKyc } from '../../kyc/components/kycContext.js'
+import { useKyc } from '../../kyc/components/kycContext'
 import { bankingError } from '../../banking/utils/banking.js'
 import { useWorkspaceText } from '../../workspace/model/useWorkspaceText'
 import { WorkspaceLayout } from '../../workspace/ui/WorkspaceLayout'
@@ -10,6 +10,9 @@ import { Feedback } from '../../workspace/ui/WorkspaceControls'
 import ui from '../../workspace/ui/Workspace.module.css'
 import { DevicesPanel, PersonalInfoPanel, PreferencesPanel, PROFILE_FORM_ID, SecurityPanel } from './SettingsPanels'
 import styles from './Settings.module.css'
+import { VerifiedIdentityPanel } from './VerifiedIdentityPanel'
+import { MfaSettings } from './MfaSettings'
+import { AccountPreferences } from './AccountPreferences'
 
 export function SettingsPage() {
   const { user, request, updateUser, logout } = useAuth()
@@ -48,11 +51,11 @@ export function SettingsPage() {
     <Feedback error={error} notice={notice}/>
     <div className={styles.grid}>
       <PersonalInfoPanel user={user} text={text} busy={busy} onSave={name => void save(name)}/>
-      <SecurityPanel kyc={status} text={text}/>
+      <SecurityPanel kyc={status} text={text} twoFactor={<MfaSettings embedded/>}/>
     </div>
     <div className={styles.grid}>
-      <PreferencesPanel text={text}/>
-      <DevicesPanel text={text} signingOut={signingOut} onSignOut={() => void signOut()}/>
+      <div className={styles.stack}><PreferencesPanel text={text}/><AccountPreferences/></div>
+      <div className={styles.stack}><DevicesPanel text={text} signingOut={signingOut} onSignOut={() => void signOut()}/><VerifiedIdentityPanel/></div>
     </div>
   </WorkspaceLayout>
 }

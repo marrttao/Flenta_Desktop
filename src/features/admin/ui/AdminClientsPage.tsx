@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../../auth/providers/authContext'
 import { useWorkspaceText } from '../../workspace/model/useWorkspaceText'
@@ -49,7 +50,7 @@ export function AdminClientsPage() {
         <caption className={styles.srOnly}>{t('Clients and verification status', 'Клієнти та статус перевірки')}</caption>
         <thead><tr>{[t('Name', 'Ім’я'), t('Email', 'Email'), t('Email Verification', 'Підтвердження email'), t('KYC Status', 'Статус KYC')].map(label => <th key={label} scope="col">{label}</th>)}</tr></thead>
         <tbody>{loading ? <SkeletonRows rows={8} columns={4}/> : data?.items.map(client => <tr key={client.id}>
-          <td title={client.id}>{client.displayName}</td><td>{client.email ?? '—'}</td>
+          <td title={client.id}><Link to={'/admin/clients/' + client.id}>{client.displayName} ↗</Link></td><td>{client.email ?? '—'}</td>
           <td><AdminBadge status={client.emailConfirmed ? 'Verified' : 'NotVerified'}/></td><td><AdminBadge status={client.kycStatus === 'Rejected' ? 'VerificationRejected' : client.kycStatus}/></td>
         </tr>)}</tbody>
       </table></div>}

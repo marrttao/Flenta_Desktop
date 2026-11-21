@@ -147,7 +147,18 @@ function AuthProvider({ children }: AuthProviderProps)
 		[refreshCurrentSession]
 	)
 
-	const login = useCallback
+    const verifyMfa = useCallback(async (factorId: string, code: string) => {
+        const original = session.current
+        const currentVersion = version.current
+        if (!original) throw new Error('Sign in first.')
+        const upgraded = await request<AuthSession>('/api/auth/mfa/verify', { method: 'POST', body: { factorId, code } })
+        if (version.current !== currentVersion || session.current?.user.id !== original.user.id) return
+        if (upgraded.user.id !== original.user.id || !upgraded.user.mfaVerified) throw new Error('Authenticator confirmation failed.')
+        version.current += 1
+        acceptSession(upgraded)
+    }, [request, acceptSession])
+
+    const login = useCallback
 	(
 		async (email: string, password: string) =>
 		{
@@ -302,8 +313,8 @@ function AuthProvider({ children }: AuthProviderProps)
 
 	const value = useMemo<AuthContextValue>
 	(
-		() => ({ user, kycEpoch, isRestoringSession, sessionInfo, request, login, register, recover, exchangeCode, logout, updateUser, refreshSession }),
-		[user, kycEpoch, isRestoringSession, sessionInfo, request, login, register, recover, exchangeCode, logout, updateUser, refreshSession]
+		() => ({ user, kycEpoch, isRestoringSession, sessionInfo, request, verifyMfa, login, register, recover, exchangeCode, logout, updateUser, refreshSession }),
+		[user, kycEpoch, isRestoringSession, sessionInfo, request, verifyMfa, login, register, recover, exchangeCode, logout, updateUser, refreshSession]
 	);
 
 

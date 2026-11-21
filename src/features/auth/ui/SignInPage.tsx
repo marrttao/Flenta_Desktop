@@ -18,7 +18,7 @@ export function SignInPage() {
     <AuthForm submitLabel={copy.signIn} successMessage={undefined} onSubmit={async (data: FormData) => {
       await login(String(data.get('email') ?? '').trim(), String(data.get('password') ?? ''))
       const returnTo = new URLSearchParams(search).get('returnTo')
-      navigate(returnTo === '/admin' || returnTo === '/admin/clients' ? returnTo : '/banking')
+      navigate(returnTo && /^\/admin(?:\/(?:clients(?:\/[0-9a-f-]{36})?|kyc|transactions|support|notifications))?$/.test(returnTo) ? returnTo : '/banking')
     }}>
       <div className={`${styles.fields} ${styles.singleColumn}`}>
         <label className={styles.field} htmlFor="auth-email">

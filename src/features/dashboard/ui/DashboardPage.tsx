@@ -5,18 +5,7 @@ import { transactionLabel, transactionStatus } from '../../banking/utils/transac
 import type { IconName } from '../../workspace/ui/Icon'
 import { DashboardLayout, Dialog, Feedback, Icon } from './DashboardLayout'
 import styles from './Dashboard.module.css'
-
-function exportTransactions(m: DashboardModel) {
-  const cell = (value: string | number) => {
-    const safe = typeof value === 'string' && /^[=+\-@\t\r]/.test(value) ? `'${value}` : String(value)
-    return `"${safe.replace(/"/g, '""')}"`
-  }
-  const rows = [['Date', 'Operation', 'Amount', 'Currency', 'Fee', 'Status'], ...m.transactions.map(t => [t.createdAt, t.kind, t.amount, t.currency, t.fee, t.status])]
-  const url = URL.createObjectURL(new Blob(['﻿' + rows.map(r => r.map(cell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' }))
-  const link = document.createElement('a')
-  link.href = url; link.download = 'flenta-transactions.csv'; link.click()
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000)
-}
+import { StatementDialog } from './StatementDialog'
 
 function BalanceCard({ model: m }: { model: DashboardModel }) {
   const account = m.activeAccount
@@ -95,10 +84,10 @@ function QuickActions({ model: m }: { model: DashboardModel }) {
   const actions: QuickAction[] = [
     { icon: 'coins', title: t('Top up', 'Поповнення'), description: t('Add funds to your account', 'Додай кошти на рахунок'), onClick: () => m.setAction('topup'), disabled: m.disabled },
     { icon: 'transfer', title: t('Transfer', 'Переказ'), description: t('Send money to contacts', 'Надсилай кошти іншим'), onClick: () => navigate('/transfers') },
-    { icon: 'help', title: t('Statement', 'Виписка'), description: t('Download your transactions as CSV', 'Завантаж операції у CSV'), onClick: () => exportTransactions(m), disabled: !m.transactions.length },
-    { icon: 'phonePlus', title: t('Mobile top-up', 'Поповнення мобільного'), description: t('Recharge your phone plan', 'Поповни рахунок телефону'), soon: true },
-    { icon: 'cardRefresh', title: t('Loan repayment', 'Погашення кредиту'), description: t('Manage upcoming payments', 'Керуй майбутніми платежами'), soon: true },
-    { icon: 'savings', title: t('Piggy bank', 'Скарбничка'), description: t('Save for your goals', 'Відкладай на свої цілі'), soon: true },
+    { icon: 'help', title: t('Statement', 'Виписка'), description: t('Download your transactions as CSV', 'Завантаж операції у CSV'), onClick: () => m.setAction('statement'), disabled: !m.user },
+    { icon: 'phonePlus', title: t('Mobile top-up', 'Поповнення мобільного'), description: t('Recharge your phone plan', 'Поповни рахунок телефону'), onClick: () => navigate('/payments?kind=mobile') },
+    { icon: 'cardRefresh', title: t('Loan repayment', 'Погашення кредиту'), description: t('Manage upcoming payments', 'Керуй майбутніми платежами'), onClick: () => navigate('/payments?kind=loan') },
+    { icon: 'savings', title: t('Piggy bank', 'Скарбничка'), description: t('Save for your goals', 'Відкладай на свої цілі'), onClick: () => navigate('/savings') },
   ]
   return <section>
     <h2 className={styles.sectionTitle}>{t('Quick actions', 'Швидкі дії')}</h2>
@@ -133,6 +122,7 @@ export function DashboardPage() {
   return <DashboardLayout model={m}>
     <div className={styles.row}><BalanceCard model={m}/><SpendingWidget model={m}/></div>
     <div className={`${styles.row} ${styles.lower}`}><RecentTransactions model={m}/><QuickActions model={m}/></div>
+    {m.action === 'statement' && <StatementDialog model={m}/>}
     {m.action === 'topup' && <TopUpDialog model={m}/>}
   </DashboardLayout>
 }

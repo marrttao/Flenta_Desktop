@@ -52,3 +52,5 @@
 .requestLink { display: flex; align-items: center; justify-content: space-between; margin-top: 21px; color: #a99aff; opacity: .55; font-size: 13px; font-weight: 600; line-height: 18px; }
 
 @media (max-width: 1100px) { .hero { grid-template-columns: minmax(0, 1fr); height: auto; padding-bottom: 24px; } .grid { grid-template-columns: minmax(0, 1fr); } }
+
+.messages { display:grid; gap:12px; max-height:40svh; overflow:auto; margin:16px 0; }.message,.staffMessage { padding:16px; border-radius:12px; background:#292638; }.staffMessage { background:#332c54; }.messages p { white-space:pre-wrap; overflow-wrap:anywhere; }.messages small { color:#b9b5c9; }.requestList { display:grid; margin-top:16px; gap:8px; }.requestList button { border:1px solid #454154; background:#292638; padding:12px; border-radius:10px; color:inherit; text-align:left; }.requestList small { display:block; color:#b9b5c9; margin-top:8px; }

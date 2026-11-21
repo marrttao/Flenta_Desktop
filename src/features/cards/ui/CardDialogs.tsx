@@ -41,9 +41,10 @@ export function TestPurchaseDialog({ model: m, card, onClose }: { model: Dashboa
     <Feedback error={m.error}/>
     <form onSubmit={async event => {
       event.preventDefault(); const data = new FormData(event.currentTarget)
-      if (await m.run(() => m.operation('/api/finance/purchases', { cardId: card.id, amount: parseAmount(data.get('amount')) }), t('Virtual purchase completed.', 'Тестову покупку оплачено.'))) onClose()
+      if (await m.run(() => m.operation('/api/finance/purchases', { cardId: card.id, amount: parseAmount(data.get('amount')), channel: String(data.get('channel')) }), t('Virtual purchase completed.', 'Тестову покупку оплачено.'))) onClose()
     }}><fieldset disabled={m.disabled}>
       <p>{card.maskedNumber} · {currency}</p>
+      <label>{t('Payment channel', 'Канал операції')}<select name="channel"><option value="Online">{t('Online purchase', 'Онлайн-покупка')}</option><option value="Contactless">{t('Contactless purchase', 'Безконтактна покупка')}</option><option value="CashWithdrawal">{t('Sandbox cash withdrawal (no cashback or savings)', 'Тестове зняття (без кешбеку та накопичень)')}</option></select></label>
       <label>{t('Amount in the card account currency', 'Сума у валюті рахунку картки')}<input name="amount" inputMode="decimal" required autoFocus/></label>
       <button className={ui.buttonPrimary} type="submit">{t('Pay with virtual funds', 'Оплатити віртуальними коштами')}</button>
     </fieldset></form>

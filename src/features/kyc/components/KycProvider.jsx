@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '../../auth/components/authContext.js'
 import { kycApi } from '../api/kycApi.js'
-import { KycContext } from './kycContext.js'
+import { KycContext } from './kycContext'
 
 export function KycProvider({ children }) {
   const { user, request, kycEpoch } = useAuth()

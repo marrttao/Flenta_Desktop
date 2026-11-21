@@ -74,3 +74,12 @@ section h2.title20 { font-size: 20px; font-weight: 600; line-height: 27px; }
   .personal, .security, .preferences { height: auto; padding-bottom: 24px; }
   .fields { grid-template-columns: minmax(0, 1fr); }
 }
+
+.stack { display:grid; gap:24px; min-width:0; }
+.security { height:auto; min-height:370px; padding-bottom:24px; }
+.preferences { height:auto; padding-bottom:24px; }
+.mfaEmbedded { padding:20px 0; border-bottom:1px solid #3d3b4d; }
+.mfaEmbedded h2 { font-size:13px; font-weight:600; margin-bottom:12px; }
+.mfaEmbedded button { min-height:36px; padding:0 12px; font-size:12px; }
+.preferenceFields { display:grid; gap:20px; margin-top:20px !important; }
+.preferenceFields > button { justify-self:start; }

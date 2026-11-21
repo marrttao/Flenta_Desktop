@@ -5,14 +5,16 @@ import { useAuth } from '../../auth/providers/authContext'
 import { useWorkspaceText } from '../model/useWorkspaceText'
 import { Icon, LogoMark, type IconName } from './Icon'
 import styles from './Workspace.module.css'
+import { ProfileAvatar } from './ProfileAvatar'
 
-export type WorkspaceSection = 'home' | 'cards' | 'transfers' | 'exchange' | 'support' | 'settings'
+export type WorkspaceSection = 'home' | 'cards' | 'transfers' | 'exchange' | 'savings' | 'notifications' | 'support' | 'settings'
 
 const sections: { id: WorkspaceSection; to: string; icon: IconName; en: string; uk: string }[] = [
   { id: 'home', to: '/', icon: 'home', en: 'Home', uk: 'Головна' },
   { id: 'cards', to: '/cards', icon: 'card', en: 'Cards', uk: 'Картки' },
   { id: 'transfers', to: '/transfers', icon: 'transfer', en: 'Transfers', uk: 'Перекази' },
   { id: 'exchange', to: '/exchange', icon: 'exchange', en: 'Currency exchange', uk: 'Обмін валют' },
+  { id: 'savings', to: '/savings', icon: 'savings', en: 'Savings', uk: 'Накопичення' },
   { id: 'support', to: '/support', icon: 'help', en: 'Support', uk: 'Допомога' },
   { id: 'settings', to: '/settings', icon: 'gear', en: 'Settings', uk: 'Налаштування' },
 ]
@@ -46,7 +48,7 @@ export function WorkspaceLayout({ section, title, subtitle, actions, children }:
     navigate(query ? `/support?${new URLSearchParams({ q: query })}` : '/support')
   }
 
-  const avatar = user && <span className={styles.avatar}><span>{initialsOf(user.displayName)}</span></span>
+  const avatar = user && <span className={styles.avatar}><ProfileAvatar initials={initialsOf(user.displayName)}/></span>
   const identity = user && <span className={styles.identity}><strong>{user.displayName}</strong>{!home && <small>FLENTA ID · {flentaId(user.id)}</small>}</span>
 
   return <div className={styles.workspace}>
@@ -72,7 +74,7 @@ export function WorkspaceLayout({ section, title, subtitle, actions, children }:
           </Link> : <Link to="/auth/sign-in" className={styles.signIn}>{t('Sign in', 'Увійти')}</Link>}
           <span className={styles.accountIcons}>
             <Link to="/settings" className={styles.iconButton} aria-label={t('Settings', 'Налаштування')}><Icon name="settings" size={18}/></Link>
-            <button type="button" className={styles.iconButton} disabled aria-label={t('Notifications — coming soon', 'Сповіщення — незабаром')} title={t('Coming soon', 'Незабаром')}><Icon name="bell" size={18}/></button>
+            <Link to="/notifications" className={styles.iconButton} aria-label={t('Notifications', 'Сповіщення')}><Icon name="bell" size={18}/></Link>
           </span>
         </div>
       </header>

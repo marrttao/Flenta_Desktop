@@ -6,9 +6,11 @@
 .dialog form { margin-top: 22px; }
 .dialog fieldset { display: flex; flex-direction: column; gap: 20px; min-width: 0; margin: 0; padding: 0; border: 0; }
 .dialog label { display: flex; flex-direction: column; gap: 9px; color: #b9b5c9; font-size: 12px; }
-.dialog :is(input, select) { width: 100%; min-height: 48px; padding: 10px 16px; border: 1px solid #3d3b4d; border-radius: 12px; background: #30275c; color: #f4f2fa; font: inherit; font-size: 14px; }
-.dialog :is(input, select):disabled { opacity: .6; }
+.dialog :is(input, select, textarea) { width: 100%; min-height: 48px; padding: 10px 16px; border: 1px solid #3d3b4d; border-radius: 12px; background: #30275c; color: #f4f2fa; font: inherit; font-size: 14px; }
+.dialog :is(input, select, textarea):disabled { opacity: .6; }
 .dialog button { font: inherit; cursor: pointer; }
 .dialog button:disabled { opacity: .45; cursor: not-allowed; }
-.dialog :is(button, input, select):focus-visible { outline: 3px solid #a99aff; outline-offset: 3px; }
+.dialog :is(button, input, select, textarea):focus-visible { outline: 3px solid #a99aff; outline-offset: 3px; }
 .close { display: inline-grid; place-items: center; width: 36px; height: 36px; padding: 6px; border: 0; background: transparent; color: inherit; }
+
+.wide { width:min(1000px,calc(100vw - 32px)); }

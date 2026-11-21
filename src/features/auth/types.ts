@@ -5,6 +5,8 @@ interface AuthUser
 	email?: string;
 	emailConfirmed?: boolean;
 	isAdmin?: boolean;
+    mfaEnabled?: boolean;
+    mfaVerified?: boolean;
 }
 
 interface AuthSession
@@ -44,7 +46,8 @@ interface AuthContextValue
 
 	request: <Type = unknown>(path: string, options?: AuthRequestOptions) => Promise<Type>;
 	
-	login: (email: string, password: string) => Promise<void>;
+	verifyMfa: (factorId: string, code: string) => Promise<void>;
+    login: (email: string, password: string) => Promise<void>;
 	register: (email: string, password: string, displayName: string) => Promise<AuthRegisterResult>;
 
 	recover: (email: string) => Promise<void>;

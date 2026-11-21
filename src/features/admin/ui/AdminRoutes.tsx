@@ -8,17 +8,22 @@ import { AdminOverviewPage } from './AdminOverviewPage'
 import { AdminClientsPage } from './AdminClientsPage'
 import { AdminState } from './AdminStates'
 import styles from './Admin.module.css'
+import { AdminNotificationsPage } from './AdminNotificationsPage'
+import { AdminClientPage } from './AdminClientPage'
+import { AdminKycPage } from './AdminKycPage'
+import { AdminTransactionsPage } from './AdminTransactionsPage'
+import { SupportRequests } from '../../support/ui/SupportRequests'
 
 function AdminAccess() {
   const { request } = useAuth()
   const { pathname } = useLocation()
   const load = useCallback(() => adminApi.access(request), [request])
   const { state, reload } = useAdminLoad('access', load)
-  const section = pathname === '/admin/clients' ? 'clients' : 'overview'
+  const section = pathname.startsWith('/admin/clients') ? 'clients' : pathname === '/admin/kyc' ? 'kyc' : pathname === '/admin/transactions' ? 'transactions' : pathname === '/admin/notifications' ? 'notifications' : pathname === '/admin/support' ? 'support' : 'overview'
   return <AdminLayout section={section}>
     {state.status === 'loading' ? <div role="status" className={styles.state}><span className={styles.spinner}/><p>Loading…</p></div>
       : state.status === 'error' ? <AdminState kind={state.forbidden ? 'forbidden' : 'error'} retry={state.forbidden ? undefined : reload}/>
-      : section === 'clients' ? <AdminClientsPage/> : <AdminOverviewPage/>}
+      : pathname.startsWith('/admin/clients/') ? <AdminClientPage/> : section === 'clients' ? <AdminClientsPage/> : section === 'kyc' ? <AdminKycPage/> : section === 'transactions' ? <AdminTransactionsPage/> : section === 'notifications' ? <AdminNotificationsPage/> : section === 'support' ? <SupportRequests staff/> : <AdminOverviewPage/>}
   </AdminLayout>
 }
 

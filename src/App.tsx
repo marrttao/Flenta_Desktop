@@ -2,7 +2,7 @@ import { BrowserRouter, Link, Route, Routes, Navigate } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
 
 import { AppProviders } from './context/AppProviders'
-import { AppRoutes } from './app/routes/AppRoutes.jsx'
+import { AppRoutes } from './app/routes/AppRoutes'
 
 import { LanguageSwitcher } from './features/localization/index'
 import { ThemeSwitcher } from './features/theme/index'
@@ -55,10 +55,18 @@ function App()
 					<Route path="/cards" element={<AppRoutes/>}/>
 					<Route path="/transfers" element={<AppRoutes/>}/>
 					<Route path="/exchange" element={<AppRoutes/>}/>
+                    <Route path="/savings" element={<AppRoutes/>}/>
+                    <Route path="/notifications" element={<AppRoutes/>}/>
+                    <Route path="/payments" element={<AppRoutes/>}/>
 					<Route path="/support" element={<AppRoutes/>}/>
 					<Route path="/settings" element={<AppRoutes/>}/>
 					<Route path="/admin" element={<AppRoutes/>}/>
 					<Route path="/admin/clients" element={<AppRoutes/>}/>
+                    <Route path="/admin/clients/:id" element={<AppRoutes/>}/>
+                    <Route path="/admin/kyc" element={<AppRoutes/>}/>
+                    <Route path="/admin/transactions" element={<AppRoutes/>}/>
+                    <Route path="/admin/support" element={<AppRoutes/>}/>
+                    <Route path="/admin/notifications" element={<AppRoutes/>}/>
 
 
 

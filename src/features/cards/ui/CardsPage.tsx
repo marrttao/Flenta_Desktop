@@ -1,9 +1,11 @@
+import { useResource } from '../../workspace/model/useResource'
+import type { IdentityData } from '../../profile/model/identity'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDashboard, type Card, type DashboardModel } from '../../dashboard/model/useDashboard'
 import { lastDigits, transactionLabel, transactionStatus } from '../../banking/utils/transactionLabel'
 import { WorkspaceLayout } from '../../workspace/ui/WorkspaceLayout'
-import { EmptyState, Feedback, SoonBadge } from '../../workspace/ui/WorkspaceControls'
+import { EmptyState, Feedback, ToggleRow } from '../../workspace/ui/WorkspaceControls'
 import { Icon } from '../../workspace/ui/Icon'
 import ui from '../../workspace/ui/Workspace.module.css'
 import { AddCardDialog, CardDetailsDialog, CloseCardDialog, TestPurchaseDialog } from './CardDialogs'
@@ -22,6 +24,7 @@ function expiry(card: Card, long = false) {
 
 function CardStatus({ card, model: m }: { card: Card; model: DashboardModel }) {
   const t = m.text
+  if (card.adminFrozen) return <span className={styles.chip}>{t('Restricted by administrator', 'Обмежено адміністратором')}</span>
   if (card.status === 'Active') return <span className={`${styles.chip} ${styles.chipActive}`}>{t('Active', 'Активна')}</span>
   if (card.status === 'Blocked') return <span className={`${styles.chip} ${styles.chipFrozen}`}>{t('Frozen', 'Заморожена')}</span>
   return <span className={`${styles.chip} ${styles.chipClosed}`}>{t('Closed', 'Закрита')}</span>
@@ -36,32 +39,33 @@ function CardActivity({ model: m, card }: { model: DashboardModel; card: Card })
       <div role="row" className={`${styles.activityGrid} ${styles.activityHeader}`}><span role="columnheader">{t('Operation', 'Операція')}</span><span role="columnheader">{t('Date', 'Дата')}</span><span role="columnheader">{t('Amount', 'Сума')}</span></div>
       {rows.map(row => {
         const outgoing = row.sourceAccountId === card.accountId
+        const incomingExchange=!outgoing && row.destinationCurrency && row.receivedAmount!=null
+        const amount=incomingExchange?row.receivedAmount!:row.amount
+        const currency=incomingExchange?row.destinationCurrency!:row.currency
         return <div role="row" key={row.id} className={`${styles.activityGrid} ${styles.activityRow}`}>
           <span role="cell" className={styles.merchant}><Icon name={row.kind === 'Purchase' ? 'card' : row.kind === 'Exchange' ? 'exchange' : 'transfer'}/>
             <span><strong>{transactionLabel(row.kind, t)}</strong><small>{row.destinationIban ? `IBAN ···· ${row.destinationIban.slice(-4)}` : row.status === 'Completed' ? 'Flenta' : transactionStatus(row.status, t)}</small></span></span>
           <span role="cell" className={styles.activityDate}>{new Date(row.createdAt).toLocaleDateString(m.locale, { month: 'short', day: '2-digit', year: 'numeric' })}</span>
-          <span role="cell" className={styles.activityAmount}>{outgoing ? '−' : '+'}{m.format(row.amount, row.currency)}</span>
+          <span role="cell" className={styles.activityAmount}>{outgoing ? '−' : '+'}{m.format(amount, currency)}</span>
         </div>
       })}
     </div> : <EmptyState icon={<Icon name="statement"/>} title={t('No activity yet', 'Операцій поки немає')}>{t('Payments and transfers from this card’s account will appear here.', 'Тут з’являться оплати й перекази з рахунку цієї картки.')}</EmptyState>}
   </section>
 }
 
-function ControlRow({ label, description }: { label: string; description: string }) {
-  return <div className={styles.controlRow}>
-    <div><strong>{label}<SoonBadge/></strong><small>{description}</small></div>
-    <span className={styles.toggle} role="switch" aria-checked="false" aria-disabled="true" aria-label={label}/>
-  </div>
-}
-
 function CardControls({ model: m, card, onClose, onPurchase }: { model: DashboardModel; card: Card; onClose: () => void; onPurchase: () => void }) {
   const t = m.text
+  const settings = { onlinePayments: card.onlinePayments, contactlessPayments: card.contactlessPayments, cashWithdrawals: card.cashWithdrawals, monthlyLimit: card.monthlyLimit }
+  const save = (patch: Partial<typeof settings>) => void m.run(() => m.request('/api/cards/' + card.id + '/settings', { method: 'PUT', body: { ...settings, ...patch } }), t('Card settings saved.', 'Налаштування картки збережено.'))
   return <section className={styles.controls}>
     <h2 className={styles.panelTitle}>{t('Card controls', 'Керування карткою')}</h2>
-    <ControlRow label={t('Online payments', 'Онлайн-платежі')} description={t('Pay securely on the web', 'Безпечна оплата в інтернеті')}/>
-    <ControlRow label={t('Contactless payments', 'Безконтактна оплата')} description={t('Tap to pay in stores', 'Оплата дотиком у магазинах')}/>
-    <ControlRow label={t('Cash withdrawals', 'Зняття готівки')} description={t('Withdraw at any ATM', 'Зняття в будь-якому банкоматі')}/>
-    <div className={styles.limit}><span>{t('Monthly spending limit', 'Місячний ліміт витрат')}<SoonBadge/></span><strong>—</strong></div>
+    <ToggleRow label={t('Online payments', 'Онлайн-платежі')} description={t('Pay securely on the web', 'Безпечна оплата в інтернеті')} checked={card.onlinePayments} disabled={m.disabled || card.status === 'Closed'} onChange={onlinePayments => save({ onlinePayments })}/>
+    <ToggleRow label={t('Contactless payments', 'Безконтактна оплата')} description={t('Tap to pay in stores', 'Оплата дотиком у магазинах')} checked={card.contactlessPayments} disabled={m.disabled || card.status === 'Closed'} onChange={contactlessPayments => save({ contactlessPayments })}/>
+    <ToggleRow label={t('Cash withdrawals', 'Зняття готівки')} description={t('Card withdrawal preference. Virtual cards are sandbox only.', 'Налаштування зняття. Віртуальні картки працюють у sandbox.')} checked={card.cashWithdrawals} disabled={m.disabled || card.status === 'Closed'} onChange={cashWithdrawals => save({ cashWithdrawals })}/>
+    <form key={card.id + ':' + card.monthlyLimit} onSubmit={e => { e.preventDefault(); save({ monthlyLimit: Number(new FormData(e.currentTarget).get('limit')) }) }}>
+      <fieldset disabled={m.disabled || card.status === 'Closed'}><label className={ui.field}>{t('Monthly spending limit', 'Місячний ліміт витрат')}<input name="limit" type="number" min="0.01" max="10000000000" step="0.01" required defaultValue={card.monthlyLimit}/></label>
+      <button type="submit" className={ui.button}>{t('Save limit', 'Зберегти ліміт')}</button></fieldset>
+    </form>
     <div className={styles.controlActions}>
       <button type="button" className={ui.button} disabled={m.disabled || card.status !== 'Active'} onClick={onPurchase}>{t('Test purchase', 'Тестова покупка')}</button>
       <button type="button" className={ui.buttonDanger} disabled={m.disabled || card.status === 'Closed'} onClick={onClose}>{t('Close card', 'Закрити картку')}</button>
@@ -77,7 +81,9 @@ export function CardsPage() {
   const card = m.cards.find(c => c.id === selectedId) ?? m.cards.find(c => c.status !== 'Closed') ?? m.cards[0]
   const account = m.accounts.find(a => a.id === card?.accountId)
   const primaryId = m.cards.find(c => c.status !== 'Closed')?.id
-  const holder = (m.user?.displayName || '').toUpperCase()
+  const identity=useResource<IdentityData|null>('/api/profile/identity')
+  const legalName=identity.state.status==='ready'?identity.state.data?.fullName:undefined
+  const holder = (legalName || '—').toUpperCase()
 
   function open(next: CardDialog) { m.clearFeedback(); setDialog(next) }
 
@@ -110,11 +116,11 @@ export function CardsPage() {
           <dl className={styles.details}>
             <dt>{t('Card number', 'Номер картки')}</dt><dd>{maskedDigits(card)}</dd>
             <dt>{t('Expiry date', 'Термін дії')}</dt><dd>{expiry(card, true)}</dd>
-            <dt>{t('Cardholder', 'Власник')}</dt><dd>{m.user?.displayName}</dd>
+            <dt>{t('Cardholder', 'Власник')}</dt><dd>{legalName || '—'}</dd>
           </dl>
           <div className={styles.cardActions}>
             <button type="button" className={ui.button} disabled={m.disabled || card.status !== 'Active'} onClick={() => open('details')}>{t('Show card details', 'Показати реквізити')}</button>
-            <button type="button" className={ui.button} disabled={m.disabled || card.status === 'Closed'} onClick={() => void m.run(() => m.bank.changeCard(card.id, card.status === 'Blocked' ? 'unblock' : 'block'),
+            <button type="button" className={ui.button} disabled={m.disabled || card.adminFrozen || card.status === 'Closed'} onClick={() => void m.run(() => m.bank.changeCard(card.id, card.status === 'Blocked' ? 'unblock' : 'block'),
               card.status === 'Blocked' ? t('Card unfrozen.', 'Картку розморожено.') : t('Card frozen.', 'Картку заморожено.'))}>
               {card.status === 'Blocked' ? t('Unfreeze card', 'Розморозити картку') : t('Freeze card', 'Заморозити картку')}
             </button>

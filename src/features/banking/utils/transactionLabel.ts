@@ -6,6 +6,9 @@ export function transactionLabel(kind: string, t: Text) {
     IbanTransfer: t('IBAN transfer', 'Переказ за IBAN'), Purchase: t('Card payment', 'Оплата карткою'),
     SavingsDeposit: t('Savings deposit', 'Поповнення цілі'), SavingsWithdrawal: t('Savings withdrawal', 'Повернення з цілі'),
     Exchange: t('Currency exchange', 'Обмін валют'),
+    CardTransfer: t('Card transfer', 'Переказ на картку'), AdminAdjustment: t('Administrative adjustment', 'Адміністративне коригування'),
+    Compensation: t('Transaction compensation', 'Компенсація операції'), MobileTopUp: t('Mobile top-up', 'Поповнення мобільного'),
+    LoanRepayment: t('Loan repayment', 'Погашення кредиту'), CashWithdrawal: t('Cash withdrawal', 'Зняття готівки'),
   }
   return labels[kind] || kind
 }

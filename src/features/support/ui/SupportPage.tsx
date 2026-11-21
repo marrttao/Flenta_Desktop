@@ -3,12 +3,13 @@ import { useSearchParams } from 'react-router-dom'
 import { apiRequest } from '../../auth/api/httpClient'
 import { useWorkspaceText } from '../../workspace/model/useWorkspaceText'
 import { WorkspaceLayout } from '../../workspace/ui/WorkspaceLayout'
-import { EmptyState, SoonBadge } from '../../workspace/ui/WorkspaceControls'
+import { EmptyState } from '../../workspace/ui/WorkspaceControls'
 import { Icon } from '../../workspace/ui/Icon'
 import ui from '../../workspace/ui/Workspace.module.css'
 import { FaqAccordion } from './FaqAccordion'
 import { faq, type FaqTopic } from './supportCopy'
 import styles from './Support.module.css'
+import { SupportRequests } from './SupportRequests'
 
 type ServiceState = 'checking' | 'up' | 'down'
 
@@ -54,20 +55,7 @@ function SupportContent({ initialQuery }: { initialQuery: string }) {
           : <EmptyState icon={<Icon name="search"/>} title={t('Nothing found', 'Нічого не знайдено')}>{t('Try another word or choose a different topic.', 'Спробуй інше слово або обери іншу тему.')}</EmptyState>}
       </section>
       <div className={styles.side}>
-        <section className={styles.contact}>
-          <h2 className={styles.panelTitle}>{t('Let’s talk', 'Поговорімо')}</h2>
-          <p className={styles.subtitle}>{t('Our team is here for you.', 'Наша команда поруч.')}</p>
-          <button type="button" className={`${ui.button} ${styles.contactButton}`} disabled><Icon name="help" size={18}/>{t('Start a live chat', 'Почати онлайн-чат')}</button>
-          <p className={styles.hint}>{t('Live chat and call-backs are coming soon', 'Онлайн-чат і дзвінки — незабаром')}</p>
-          <button type="button" className={`${ui.button} ${styles.contactButton}`} disabled>{t('Request a call', 'Замовити дзвінок')}</button>
-        </section>
-        <section className={styles.requests}>
-          <div className={styles.requestsHead}><h2 className={styles.panelTitle}>{t('Your requests', 'Твої звернення')}</h2><SoonBadge/></div>
-          <strong className={styles.requestTitle}>{t('No requests yet', 'Звернень поки немає')}</strong>
-          <small className={styles.requestMeta}>{t('Your conversations with our team will appear here.', 'Тут з’являться твої звернення до команди.')}</small>
-          <hr className={styles.divider}/>
-          <span className={styles.requestLink}>{t('View conversation', 'Переглянути розмову')}<Icon name="arrow" size={18}/></span>
-        </section>
+        <SupportRequests/>
       </div>
     </div>
   </>

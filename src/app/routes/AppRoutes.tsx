@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState, type ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
 import { usePathname } from './navigation.js'
 import { Link } from './Link.jsx'
-import { useAuth } from '../../features/auth/components/authContext.js'
-import { ProtectedRoute } from '../../features/auth/components/ProtectedRoute.tsx'
+import { useAuth } from '../../features/auth/providers/authContext'
+import { ProtectedRoute } from '../../features/auth/components/ProtectedRoute'
 import { SignInPage } from '../../features/auth/ui/SignInPage'
 import { SignUpPage } from '../../features/auth/ui/SignUpPage'
 import { ConfirmEmailPage } from '../../features/auth/pages/ConfirmEmailPage.jsx'
@@ -17,13 +17,19 @@ import { CurrencyExchangePage } from '../../features/currency/ui/CurrencyExchang
 import { SupportPage } from '../../features/support/ui/SupportPage'
 import { SettingsPage } from '../../features/settings/ui/SettingsPage'
 import { KycProvider } from '../../features/kyc/components/KycProvider.jsx'
-import { useKyc } from '../../features/kyc/components/kycContext.js'
+import { useKyc } from '../../features/kyc/components/kycContext'
 import { KycPage } from '../../features/kyc/pages/KycPage.jsx'
-import { AdminRoutes } from '../../features/admin/ui/AdminRoutes'
+import { PaymentsPage } from '../../features/payments/ui/PaymentsPage'
+import { NotificationsPage } from '../../features/notifications/ui/NotificationsPage'
+import { SavingsPage } from '../../features/savings/ui/SavingsPage'
+import { MfaPage } from '../../features/auth/ui/MfaPage'
+const AdminRoutes = lazy(() => import('../../features/admin/ui/AdminRoutes').then(module => ({ default: module.AdminRoutes })))
 
 export function AppRoutes() {
   const path = usePathname()
-  if (path === '/admin' || path === '/admin/clients') return <AdminRoutes />
+  const { user } = useAuth()
+  if (user?.mfaEnabled && !user.mfaVerified) return <MfaPage key={user.id}/>
+  if (path === '/admin' || path.startsWith('/admin/')) return <Suspense fallback={<p role="status">Loading…</p>}><AdminRoutes /></Suspense>
   return <KycProvider><ApplicationRoutes /></KycProvider>
 }
 
@@ -33,7 +39,7 @@ function ApplicationRoutes() {
   const { status } = useKyc()
   const verified = status?.canAccess === true
   const [logoutError, setLogoutError] = useState('')
-  const routes = {
+  const routes: Record<string, ReactNode> = {
     '/': <DashboardPage key={user?.id || 'guest'} />,
     '/banking': <Navigate to="/" replace />,
     '/cards': <ProtectedRoute><CardsPage key={user?.id} /></ProtectedRoute>,
@@ -48,7 +54,10 @@ function ApplicationRoutes() {
     '/auth/reset-password': <ResetPasswordPage />,
     '/auth/change-password': <ProtectedRoute><ChangePasswordPage /></ProtectedRoute>,
     '/profile': <Navigate to="/settings" replace />,
-    '/finance': <Navigate to="/exchange" replace />,
+    '/finance': <Navigate to="/savings" replace />,
+    '/savings': <ProtectedRoute><SavingsPage key={user?.id}/></ProtectedRoute>,
+    '/notifications': <ProtectedRoute><NotificationsPage key={user?.id}/></ProtectedRoute>,
+    '/payments': <ProtectedRoute><PaymentsPage key={user?.id}/></ProtectedRoute>,
     '/kyc': <ProtectedRoute><KycPage /></ProtectedRoute>,
   }
 
