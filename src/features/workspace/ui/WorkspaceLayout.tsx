@@ -57,6 +57,7 @@ export function WorkspaceLayout({ section, title, subtitle, actions, children }:
           <Icon name={item.icon} size={24}/>{t(item.en, item.uk)}
         </Link>)}
       </nav>
+      {user?.isAdmin && <Link to="/admin" className={styles.navItem}>{t('Administration', 'Адміністрування')}</Link>}
     </aside>
     <div className={styles.main}>
       <header className={styles.topbar}>

@@ -57,6 +57,8 @@ function App()
 					<Route path="/exchange" element={<AppRoutes/>}/>
 					<Route path="/support" element={<AppRoutes/>}/>
 					<Route path="/settings" element={<AppRoutes/>}/>
+					<Route path="/admin" element={<AppRoutes/>}/>
+					<Route path="/admin/clients" element={<AppRoutes/>}/>
 
 
 

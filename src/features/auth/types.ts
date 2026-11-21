@@ -4,6 +4,7 @@ interface AuthUser
 	displayName: string;
 	email?: string;
 	emailConfirmed?: boolean;
+	isAdmin?: boolean;
 }
 
 interface AuthSession

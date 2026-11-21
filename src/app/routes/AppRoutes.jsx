@@ -19,8 +19,11 @@ import { SettingsPage } from '../../features/settings/ui/SettingsPage'
 import { KycProvider } from '../../features/kyc/components/KycProvider.jsx'
 import { useKyc } from '../../features/kyc/components/kycContext.js'
 import { KycPage } from '../../features/kyc/pages/KycPage.jsx'
+import { AdminRoutes } from '../../features/admin/ui/AdminRoutes'
 
 export function AppRoutes() {
+  const path = usePathname()
+  if (path === '/admin' || path === '/admin/clients') return <AdminRoutes />
   return <KycProvider><ApplicationRoutes /></KycProvider>
 }
 
