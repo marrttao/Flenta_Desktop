@@ -21,6 +21,7 @@ import type
 import { useIdleTimeout } from '../hooks/useIdleTimeout';
 import { useTokenExpiry } from '../hooks/useTokenExpiry';
 import { getTokenExpiryMs } from '../utils/jwtUtils';
+import { createSessionRefresh } from '../utils/sessionRefresh.js';
 
 import { IdleTimeoutModal } from '../components/IdleTimeoutModal/IdleTimeoutModal';
 
@@ -82,7 +83,6 @@ function AuthProvider({ children }: AuthProviderProps)
 
 	const session = useRef<AuthSession | null>(null);
 	const version = useRef<number>(0);
-	const refresh = useRef<Promise<AuthSession> | null>(null);
 
 
 
@@ -90,15 +90,24 @@ function AuthProvider({ children }: AuthProviderProps)
 	(
 		(value: AuthSession | null) =>
 		{
+			const ownerChanged = session.current?.user.id !== value?.user.id;
 			session.current = value;
 
 			setUser(value?.user ?? null);
-			setKycEpoch((epoch) => epoch + 1);
+			if (ownerChanged) { setKycEpoch((epoch) => epoch + 1); }
 			setExpiresAt(resolveExpiresAt(value));
 			persist(value);
 		},
 		[]
 	);
+
+	const refreshCurrentSession = useMemo(() => createSessionRefresh({
+		getSession: () => session.current,
+		getVersion: () => version.current,
+		refresh: (token: string) => authApi.refresh(token) as Promise<AuthSession>,
+		acceptSession,
+		endSession: () => { version.current += 1; acceptSession(null); },
+	}), [acceptSession]);
 
 	const request = useCallback
 	(
@@ -110,7 +119,12 @@ function AuthProvider({ children }: AuthProviderProps)
 			const usedToken = session.current.accessToken;
 			const send = async (requestOptions: ApiRequestOptions): Promise<Type> =>
 			{
-				try { return await apiRequest<Type>(path, requestOptions); }
+				try
+				{
+					const result = await apiRequest<Type>(path, requestOptions);
+					if (currentVersion !== version.current) { throw new Error('Session was closed!'); }
+					return result;
+				}
 				catch (error)
 				{
 					if (currentVersion === version.current && !path.startsWith('/api/kyc')
@@ -125,36 +139,12 @@ function AuthProvider({ children }: AuthProviderProps)
 			{
 				if (readStatus(error) !== 401 || !session.current || currentVersion !== version.current) { throw error; }
 				if (session.current.accessToken !== usedToken) { return send({ ...options, token: session.current.accessToken }); }
-				if (!refresh.current)
-				{
-					refresh.current = (authApi.refresh(session.current.refreshToken) as Promise<AuthSession>)
-					.then
-					(
-						(value: AuthSession) =>
-						{
-							if (currentVersion !== version.current) { throw new Error("Session was closed!"); }
-							
-							acceptSession(value);
-							return value;
-						}
-					)
-					.catch
-					(
-						(refreshError: unknown) =>
-						{
-							if (currentVersion === version.current) { acceptSession(null); }
-
-							throw refreshError;
-						}
-					)
-					.finally(() => { refresh.current = null; });
-				}
-
-				const refreshedSession = await refresh.current;
+				const refreshedSession = await refreshCurrentSession();
+				if (currentVersion !== version.current) { throw new Error('Session was closed!'); }
 				return send({ ...options, token: refreshedSession.accessToken });
 			}
 		},
-		[acceptSession]
+		[refreshCurrentSession]
 	)
 
 	const login = useCallback
@@ -239,12 +229,9 @@ function AuthProvider({ children }: AuthProviderProps)
 		{
 			if (!session.current?.refreshToken) { return; }
 
-			const value = await (authApi.refresh(session.current.refreshToken) as Promise<AuthSession>);
-
-			version.current++;
-			acceptSession(value);
+			await refreshCurrentSession();
 		},
-		[acceptSession]
+		[refreshCurrentSession]
 	);
 
 	useEffect
@@ -252,6 +239,7 @@ function AuthProvider({ children }: AuthProviderProps)
 		() =>
 		{
 			let active = true;
+			const restoringVersion = version.current;
 			const refreshToken = storageService.getItem(StorageKeys.REFRESH_TOKEN);
 			if (!refreshToken) { setIsRestoringSession(false); return; }
 
@@ -262,13 +250,13 @@ function AuthProvider({ children }: AuthProviderProps)
 					{
 						const valie = await (authApi.refresh(refreshToken) as Promise<AuthSession>);
 
-						if (!active) { return; }
+						if (!active || restoringVersion !== version.current) { return; }
 						acceptSession(valie);
 					}
-					catch
+					catch (error)
 					{
-						if (!active) { return; }
-						acceptSession(null);
+						if (!active || restoringVersion !== version.current) { return; }
+						if ([400, 401, 403].includes(readStatus(error) ?? 0)) { acceptSession(null); }
 					}
 					finally
 					{
