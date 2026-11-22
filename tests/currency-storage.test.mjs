@@ -5,7 +5,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { createServer } from 'vite'
 
 test('currency and storage regressions', async (t) => {
-  const server = await createServer({ server: { middlewareMode: true }, appType: 'custom' })
+  const server = await createServer({ server: { middlewareMode: true, hmr: false }, optimizeDeps: { noDiscovery: true, include: [] }, appType: 'custom' })
   try {
     const { StorageService, MemoryAdapter, StorageKeys } = await server.ssrLoadModule('/src/storage/index.ts')
     const { isUserCurrencyList, reorderUserCurrencies } = await server.ssrLoadModule('/src/features/currency/utils/userCurrencies.ts')

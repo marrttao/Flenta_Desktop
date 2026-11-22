@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import type { DashboardModel, Goal } from '../model/useDashboard'
+import type { DashboardModel, Goal } from '../../dashboard/model/useDashboard'
 import { parseAmount } from '../../banking/utils/banking.js'
-import { Dialog, Feedback, Icon } from './DashboardLayout'
-import styles from './Dashboard.module.css'
+import { Dialog, Feedback, Icon } from '../../dashboard/ui/DashboardLayout'
+import styles from './Savings.module.css'
 
 function GoalEditor({ goal, model: m, onClose }: { goal: Goal; model: DashboardModel; onClose: () => void }) {
   const t = m.text

@@ -1,0 +1,69 @@
+/* Cards (Figma: app Desktop › Laptop · Cards, 1440×1024). Workspace is 1136 wide; panels are placed on its grid. */
+.addButton { min-width: 176px; white-space: pre; }
+.cardPicker { display: flex; flex-wrap: wrap; gap: 12px; margin: -12px 0 24px; }
+.grid { display: grid; grid-template-columns: minmax(0, 544fr) minmax(0, 568fr); gap: 24px; }
+.lower { display: grid; grid-template-columns: minmax(0, 720fr) minmax(0, 392fr); gap: 24px; margin-top: 24px; align-items: start; }
+
+/* Card face 544×274 */
+.bankCard { display: flex; flex-direction: column; height: 274px; padding: 24px 28px 0; border-radius: 16px; background: #332c54; color: #f4f2fa; }
+.bankCardTop { display: flex; justify-content: space-between; align-items: flex-start; height: 38px; }
+.bankCardTop strong { font-size: 28px; font-weight: 600; line-height: 38px; }
+.bankCardTop span { margin: 6px 21px 0 0; font-size: 14px; line-height: 19px; }
+.label { margin-top: 26px; font-size: 13px; line-height: 18px; }
+.balance { margin-top: 4px; font-size: 38px; font-weight: 500; line-height: 52px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.number { margin-top: 28px; font-size: 18px; font-weight: 500; line-height: 25px; white-space: pre; }
+.bankCardBottom { display: flex; justify-content: space-between; margin: 16px 34px 0 0; font-size: 11px; font-weight: 600; line-height: 15px; }
+.bankCardBottom span:last-child { color: #b9b5c9; font-size: 12px; line-height: 16px; }
+
+/* Card overview 568×274 */
+.overview { height: 274px; padding: 20px 24px 0; border-radius: 16px; background: #20202c; }
+.overviewHead { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.overview h2.overviewTitle { font-size: 20px; font-weight: 600; line-height: 27px; }
+.overviewHead p { margin: 7px 0 0; color: #b9b5c9; font-size: 13px; line-height: 18px; }
+.chip { display: inline-grid; place-items: center; min-width: 88px; height: 27px; margin-top: 2px; padding: 0 16px; border-radius: 30px; font-size: 12px; font-weight: 600; line-height: 16px; color: #30275c; }
+.chipActive { background: #b8f0d5; }
+.chipFrozen { background: #f2e6b8; }
+.chipClosed { background: #f4c8cd; }
+.details { display: grid; grid-template-columns: 264px minmax(0, 1fr); row-gap: 17px; margin: 19px 0 0; padding-top: 22px; border-top: 1px solid #3d3b4d; font-size: 13px; line-height: 18px; }
+.details dt { color: #b9b5c9; }
+.details dd { margin: 0; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: pre; }
+.cardActions { display: grid; grid-template-columns: minmax(0, 230fr) minmax(0, 266fr); gap: 24px; margin-top: 17px; }
+.cardActions button { min-height: 44px; }
+
+/* Recent card activity 720×350 */
+.activity { min-height: 350px; padding: 22px 24px 8px; border-radius: 16px; background: #20202c; }
+.activityHead { display: flex; align-items: baseline; justify-content: space-between; }
+.activity h2.panelTitle, .controls h2.panelTitle { font-size: 20px; font-weight: 600; line-height: 27px; }
+.viewAll { margin-right: 23px; color: #a99aff !important; font-size: 12px; font-weight: 600; }
+.activityGrid { display: grid; grid-template-columns: 332px 212px minmax(0, 1fr); }
+.activityHeader { margin-top: 25px; height: 30px; border-bottom: 1px solid #3d3b4d; color: #b9b5c9; font-size: 11px; line-height: 15px; }
+.activityHeader span:last-child { padding-left: 8px; }
+.activityRow { align-items: center; height: 55px; border-bottom: 1px solid #3d3b4d; }
+.activityHeader + .activityRow { height: 63px; padding-top: 8px; }
+.activityRow:last-child { border-bottom: 0; }
+.merchant { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.merchant svg { flex-shrink: 0; }
+.merchant strong { display: block; font-size: 13px; font-weight: 600; line-height: 18px; }
+.merchant small { display: block; margin-top: 3px; color: #b9b5c9; font-size: 11px; line-height: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.activityDate { color: #b9b5c9; font-size: 12px; line-height: 16px; }
+.activityAmount { font-size: 13px; font-weight: 500; line-height: 18px; white-space: nowrap; }
+
+/* Card controls 392×350 */
+.controls { min-height: 350px; padding: 22px 24px 20px; border-radius: 16px; background: #20202c; }
+.controlRow { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 37px; margin-top: 31px; }
+.controlRow:first-of-type { margin-top: 32px; }
+.controlRow strong { display: block; font-size: 13px; font-weight: 500; line-height: 18px; }
+.controlRow small { display: block; margin-top: 4px; color: #b9b5c9; font-size: 11px; line-height: 15px; }
+.toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; margin-right: 2px; border-radius: 20px; background: #3d3b4d; }
+.toggle::after { content: ''; position: absolute; top: 4px; left: 4px; width: 16px; height: 16px; border-radius: 12px; background: #f4f2fa; }
+.limit { display: flex; justify-content: space-between; gap: 12px; margin-top: 31px; padding-top: 19px; border-top: 1px solid #3d3b4d; color: #b9b5c9; font-size: 12px; line-height: 16px; }
+.limit strong { color: #f4f2fa; font-size: 13px; font-weight: 600; }
+.controlActions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-top: 20px; }
+.requisites { display: grid; gap: 6px; margin: 22px 0; }
+.requisites dt { color: #b9b5c9; font-size: 12px; }
+.requisites dd { margin: 0 0 12px; font-size: 20px; letter-spacing: .03em; }
+
+@media (max-width: 1100px) {
+  .grid, .lower { grid-template-columns: minmax(0, 1fr); }
+  .activityGrid { grid-template-columns: minmax(0, 1fr) 120px 120px; }
+}

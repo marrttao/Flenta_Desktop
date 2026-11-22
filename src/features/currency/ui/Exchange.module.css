@@ -1,0 +1,49 @@
+/* Currency exchange (Figma: app Desktop › Laptop · Currency exchange, 1440×1024). Offsets are relative to the page title. */
+.pair { display: grid; grid-template-columns: 400px minmax(60px, 1fr) 400px; align-items: start; margin-top: 32px; padding: 0 40px; }
+.side { height: 280px; padding: 20px 24px 0; border-radius: 16px; background: #20202c; }
+.sideFrom { background: #332c54; }
+.sideHead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; height: 25px; }
+.side h2.sideTitle { font-size: 18px; font-weight: 600; line-height: 25px; }
+.flagPicker { position: relative; display: block; width: 30px; height: 20px; cursor: pointer; }
+.flagPicker select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.flagPicker:focus-within { outline: 3px solid #a99aff; outline-offset: 3px; border-radius: 2px; }
+.flag { display: block; width: 30px; height: 20px; border-radius: 2.2px; object-fit: cover; }
+.flagCode { display: grid; place-items: center; width: 30px; height: 20px; border-radius: 2.2px; background: #30275c; color: #a99aff; font-size: 9px; font-weight: 700; }
+.balance { margin: 31px 0 0; font-size: 36px; font-weight: 600; line-height: 49px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.amountLabel { display: block; margin-top: 59px; color: #b9b5c9; font-size: 12px; font-weight: 500; line-height: 16px; }
+.amountField { display: flex; align-items: center; gap: 8px; height: 44px; margin-top: 10px; padding: 0 6px 0 12px; border: 1px solid #3d3b4d; border-radius: 12px; background: #30275c; }
+.amountField :is(input, output) { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; background: transparent; color: #f4f2fa; font-size: 18px; font-weight: 600; line-height: 42px; }
+.amountField input::placeholder { color: #b9b5c9; }
+.amountField input:focus-visible { outline: none; }
+.amountField:focus-within { border-color: #a99aff; }
+.swap { justify-self: center; display: grid; place-items: center; width: 60px; height: 60px; margin-top: 108px; padding: 0; border: 0; border-radius: 50%; background: #332c54; color: #f4f2fa; }
+.swap:hover:not(:disabled) { background: #3d3466; }
+
+h2.ratesTitle { margin: 38px 0 0; font-size: 18px; font-weight: 600; line-height: 25px; }
+.rates { display: grid; grid-template-columns: 768px minmax(0, 1fr); min-height: 364px; margin-top: 21px; border-radius: 16px; background: #20202c; }
+.chartArea { padding: 30px 22px 27px 16px; border-right: 1px solid #3d3b4d; }
+.quote { display: flex; flex-direction: column; padding: 26px 24px 32px 24px; }
+.rate { margin: 0 0 0 8px; font-size: 22px; font-weight: 600; line-height: 30px; }
+.terms { display: grid; grid-template-columns: 1fr auto; gap: 24px 16px; margin: 52px 0 0; font-size: 15px; font-weight: 600; line-height: 20px; }
+.terms dd { margin: 0; text-align: right; }
+.expired { margin-top: 16px; color: #f2e6b8; font-size: 12px; }
+.action { width: 320px; max-width: 100%; margin-top: auto; font-size: 14px; }
+
+/* Chart (Figma: BarLineChart 730×307) */
+.chart { margin: 0; padding: 12px; background: #20202c; }
+.chartGrid { display: grid; grid-template-columns: 17px minmax(0, 1fr); height: 246px; }
+.axis { display: flex; flex-direction: column; justify-content: space-between; padding: 0 3px 22px; color: #f4f2fa; font-size: 9px; line-height: 12px; }
+.bars { display: flex; align-items: stretch; border-left: 1px solid #3d3b4d; background: repeating-linear-gradient(to bottom, #3d3b4d 0 1px, transparent 1px 44.8px); background-size: 100% calc(100% - 22px); background-repeat: no-repeat; }
+.barSlot { position: relative; flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; min-width: 0; padding-bottom: 22px; }
+.bar { width: min(51px, 61%); min-height: 2px; background: rgb(169 154 255 / 80%); }
+.barValue { margin-bottom: 4px; color: #b9b5c9; font-size: 9px; white-space: nowrap; }
+.barLabel { position: absolute; bottom: 4px; color: #f4f2fa; font-size: 9px; }
+.legend { display: flex; align-items: center; justify-content: center; gap: 6px; height: 18px; margin-top: 19px; color: #f4f2fa; font-size: 9px; }
+.legendSwatch { width: 9px; height: 9px; border-radius: 2px; background: rgb(169 154 255 / 80%); }
+
+@media (max-width: 1100px) {
+  .pair { grid-template-columns: minmax(0, 1fr); padding: 0; gap: 16px; }
+  .swap { margin-top: 0; transform: rotate(90deg); }
+  .rates { grid-template-columns: minmax(0, 1fr); }
+  .chartArea { border-right: 0; border-bottom: 1px solid #3d3b4d; }
+}

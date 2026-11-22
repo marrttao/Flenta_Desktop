@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../../auth/components/authContext.js'
-import { useKyc } from '../components/kycContext.js'
+import { useKyc } from '../components/kycContext'
 import { kycApi } from '../api/kycApi.js'
 import { DiditVerification } from '../components/DiditVerification.jsx'
 

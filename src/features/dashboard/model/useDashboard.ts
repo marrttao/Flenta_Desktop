@@ -4,13 +4,14 @@ import { useTranslation } from '../../localization'
 import { createBankingApi, createIdempotentRequest } from '../../banking/api/bankingApi.js'
 import { bankingError } from '../../banking/utils/banking.js'
 import { financeApi } from '../../finance/api/financeApi.js'
+import { currentMonthRange } from './dateRange.js'
 
 export interface Account { id: string; iban: string; currency: string; balance: number }
-export interface Card { id: string; accountId: string; maskedNumber: string; status: string; expiryMonth: number; expiryYear: number }
+export interface Card { id: string; accountId: string; maskedNumber: string; status: string; expiryMonth: number; expiryYear: number; onlinePayments: boolean; contactlessPayments: boolean; cashWithdrawals: boolean; monthlyLimit: number; adminFrozen: boolean }
 export interface Transaction {
   id: string; kind: string; status: string; amount: number; fee: number; currency: string; createdAt: string
   sourceAccountId: string | null; destinationAccountId: string | null; destinationIban: string | null; failureCode: string | null
-  saved?: number; cashback?: number; savingsSkipReason?: string | null
+  destinationCurrency?:string|null;receivedAmount?:number|null; memo?: string | null; saved?: number; cashback?: number; savingsSkipReason?: string | null
 }
 export interface Goal {
   id: string; fundingAccountId: string; name: string; currency: string; target: number; balance: number
@@ -19,17 +20,17 @@ export interface Goal {
 }
 export interface Analytics { currencies: { currency: string; expenses: number; purchases: number }[] }
 export interface TransferQuote { amount: number; fee: number; total: number; currency: string; sufficientFunds: boolean }
-export type DashboardAction = 'topup' | 'transfer' | 'accounts' | 'cards' | 'purchase' | 'help' | null
+export type DashboardAction = 'topup' | 'statement' | null
+const moneyNumber = new Intl.NumberFormat('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const empty = { accounts: [] as Account[], cards: [] as Card[], transactions: [] as Transaction[] }
 
 export function useDashboard() {
   const { user, request, logout } = useAuth()
   const { language } = useTranslation()
   const text = useCallback((en: string, uk: string) => language === 'uk' ? uk : en, [language])
-  const locale = { en: 'en-GB', uk: 'uk-UA', pl: 'pl-PL', de: 'de-DE' }[language]
-  const format = useCallback((value: number, currency: string) => new Intl.NumberFormat(locale, {
-    style: 'currency', currency, maximumFractionDigits: 2,
-  }).format(value), [locale])
+  const locale = { en: 'en-US', uk: 'uk-UA', pl: 'pl-PL', de: 'de-DE' }[language]
+  // Figma money format: "40 543,20 UAH" (space-grouped, decimal comma, ISO code after the amount).
+  const format = useCallback((value: number, currency: string) => `${moneyNumber.format(value)} ${currency}`, [])
   const bank = useMemo(() => createBankingApi(request), [request])
   const operation = useMemo(() => createIdempotentRequest(request), [request])
   const [data, setData] = useState(empty)
@@ -42,6 +43,7 @@ export function useDashboard() {
   const [goalsError, setGoalsError] = useState('')
   const [analyticsError, setAnalyticsError] = useState('')
   const [notice, setNotice] = useState('')
+  const [preferredCurrency,setPreferredCurrency] = useState('UAH')
   const [accountId, setAccountId] = useState('')
   const [cardId, setCardId] = useState('')
   const [offset, setOffset] = useState(0)
@@ -49,7 +51,7 @@ export function useDashboard() {
   const generation = useRef(0)
   const inFlight = useRef(false)
   const selectedCard = data.cards.find(c => c.id === cardId) ?? data.cards[0]
-  const activeAccount = data.accounts.find(a => a.id === accountId) ?? data.accounts.find(a => a.id === selectedCard?.accountId) ?? data.accounts[0]
+  const activeAccount = data.accounts.find(a => a.id === accountId) ?? (cardId ? data.accounts.find(a => a.id === selectedCard?.accountId) : undefined) ?? data.accounts.find(a=>a.currency===preferredCurrency) ?? data.accounts[0]
   const activeCard = data.cards.find(c => c.accountId === activeAccount?.id && c.id === cardId)
     ?? data.cards.find(c => c.accountId === activeAccount?.id)
   const disabled = !user || busy || loading
@@ -58,14 +60,13 @@ export function useDashboard() {
     if (!user) return
     const current = ++generation.current
     setLoading(true)
-    const now = new Date()
-    const through = now.toISOString().slice(0, 10)
-    const from = `${through.slice(0, 7)}-01`
+    const { from, through } = currentMonthRange()
     const results = await Promise.allSettled([
-      bank.snapshot(offset), financeApi.goals(request), financeApi.analytics(request, from, through),
+      bank.snapshot(offset), financeApi.goals(request), financeApi.analytics(request, from, through), request<{defaultCurrency:string}>('/api/settings'),
     ])
     if (current !== generation.current) return
-    const [snapshot, savings, spending] = results
+    const [snapshot, savings, spending,settings] = results
+    if(settings.status==='fulfilled')setPreferredCurrency(settings.value.defaultCurrency)
     if (snapshot.status === 'fulfilled') { setData(snapshot.value as typeof empty); setLoaded(true); setError('') }
     else setError(bankingError(snapshot.reason))
     if (savings.status === 'fulfilled') { setGoals(savings.value as Goal[]); setGoalsError('') }

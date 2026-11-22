@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from '../../localization/index'
 import { useAuth } from '../providers/authContext'
 import { AuthForm } from '../components/AuthForm.jsx'
@@ -11,12 +11,14 @@ export function SignInPage() {
   const copy = authCopy[language]
   const { login } = useAuth()
   const navigate = useNavigate()
+  const { search } = useLocation()
 
   return <AuthLayout title={copy.signInTitle} description={copy.signInDescription}
     footer={<p>{copy.noAccount} <Link to="/auth/sign-up">{copy.createAccount}</Link></p>}>
     <AuthForm submitLabel={copy.signIn} successMessage={undefined} onSubmit={async (data: FormData) => {
       await login(String(data.get('email') ?? '').trim(), String(data.get('password') ?? ''))
-      navigate('/banking')
+      const returnTo = new URLSearchParams(search).get('returnTo')
+      navigate(returnTo && /^\/admin(?:\/(?:clients(?:\/[0-9a-f-]{36})?|kyc|transactions|support|notifications))?$/.test(returnTo) ? returnTo : '/banking')
     }}>
       <div className={`${styles.fields} ${styles.singleColumn}`}>
         <label className={styles.field} htmlFor="auth-email">

@@ -27,10 +27,16 @@ export async function apiRequest(path, { method = 'GET', body, token, idempotenc
     throw new ApiError('Не вдалося підключитися до API. Спробуй пізніше.', 0)
   }
   if (!response.ok) {
-    const problem = await response.json().catch(() => ({}))
-    const validation = problem.errors ? Object.values(problem.errors).flat().join(' ') : ''
-    throw new ApiError(validation || problem.detail || problem.title || 'Запит не виконано.', response.status, problem.code || null)
+    const payload = await response.json().catch(() => null)
+    const problem = payload && typeof payload === 'object' && !Array.isArray(payload) ? payload : {}
+    const validation = problem.errors && typeof problem.errors === 'object' && !Array.isArray(problem.errors)
+      ? Object.values(problem.errors).flat().filter(value => typeof value === 'string' && value.trim()).join(' ') : ''
+    const detail = typeof problem.detail === 'string' ? problem.detail.trim() : ''
+    const title = typeof problem.title === 'string' ? problem.title.trim() : ''
+    throw new ApiError(validation || detail || title || 'Запит не виконано.', response.status,
+      typeof problem.code === 'string' ? problem.code : null)
   }
   if (response.status === 204) return null
-  return response.json()
+  try { return await response.json() }
+  catch { throw new ApiError('API повернув некоректну відповідь.', response.status, 'client.invalid_response') }
 }
