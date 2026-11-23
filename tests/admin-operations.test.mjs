@@ -32,5 +32,28 @@ test('privileged commands keep their business identity across confirmation retri
       await assert.rejects(operation('/b', { amount: 2, reason: 'Second reason', password: 'secret' }))
       assert.equal(new Set(keys).size, 4)
     })
+    await t.test('returning to an earlier unresolved command preserves its original key', async () => {
+      const keys = []
+      let count = 0
+      const operation = createAdminOperation(async (_path, options) => {
+        keys.push(options.idempotencyKey)
+        throw new Error('Response lost')
+      }, () => 'key-' + ++count)
+      await assert.rejects(operation('/adjustments', { amount: 10, reason: 'Correction', password: 'first' }))
+      await assert.rejects(operation('/adjustments', { amount: 20, reason: 'Correction', password: 'first' }))
+      await assert.rejects(operation('/adjustments', { amount: 10, reason: 'Correction', password: 'corrected' }))
+      assert.deepEqual(keys, ['key-1', 'key-2', 'key-1'])
+    })
+    await t.test('concurrent submissions of the same command share one request', async () => {
+      let calls = 0
+      let release
+      const gate = new Promise(resolve => { release = resolve })
+      const operation = createAdminOperation(async () => { calls++; await gate; return true }, () => 'key')
+      const first = operation('/adjustments', { amount: 10, password: 'secret' })
+      const second = operation('/adjustments', { amount: 10, password: 'secret' })
+      release()
+      assert.deepEqual(await Promise.all([first, second]), [true, true])
+      assert.equal(calls, 1)
+    })
   } finally { await server.close() }
 })
